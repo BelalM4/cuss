@@ -1,77 +1,62 @@
-# Cuss: hackathon demo script (about 3 minutes)
+# Cuss: Cal Hacks 13.0 table pitch (2 minutes, live demo)
 
-## Before you go on stage (10-minute checklist)
-- [ ] Laptop plugged in, **Do Not Disturb** on, other tabs and apps closed.
-- [ ] Internet works (bring a phone hotspot as a backup; the AI needs the internet).
-- [ ] In `.env`, set `AI_EFFORT=low` for snappy answers, then run `npm start`.
-- [ ] Open **Chrome** at `http://localhost:3000`, then press **⌘ + Shift + F** for full screen and **⌘ +** once so the room can read it.
-- [ ] Click **Try the live demo** and sign in with your name. In Settings, **Start the demo over** gives you a clean slate.
-- [ ] Click the mic once and allow microphone access, so the permission pop-up doesn't appear mid-demo.
-- [ ] Do one practice run of every step below, then **Start the demo over** again.
-- [ ] Record a backup screen video of a good run (⌘ + Shift + 5) in case the Wi-Fi dies.
+Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get about two minutes, and they want to see it **working live**. The whole team must be at the table.
 
----
-
-## 1. The hook (20 seconds)
-> "Quick show of hands: who has ever missed an assignment that was sitting in Canvas the whole time?
-> Canvas has everything: deadlines, lecture notes, your professors. But it's a filing cabinet, not an assistant.
-> We built **Cuss**, an AI that actually reads your Canvas and handles your semester for you. Let me show you."
-
-## 2. Log in (15 seconds)
-- Show the landing page, then click **Try the live demo** and sign in.
-> "Students log in with their normal school login, the same one they use for Canvas. No passwords, no setup.
-> For today, this is a sample student at Demo University."
-
-- Point at the **Today** panel: things due this week, missing work, grades.
-> "The second I log in, it already knows what's due and what's missing."
-
-## 3. "What's due?" and the live agent steps (30 seconds)
-- Click **What's due?**
-- While it works, point at the step bubbles: *Checked deadlines… Read 2 announcements…*
-> "You can watch it work. It's pulling my deadlines and reading my professors' announcements, and it noticed
-> the quiz got moved. That's from an announcement I never read."
-
-## 4. Study from real course notes (40 seconds)
-- Type: **"Quiz me for Quiz 5"**
-- Point at *Opened the course… Read "Week 8: The Cell Membrane & Transport"*.
-> "It isn't making things up from the internet. It opened my actual biology notes from Canvas and wrote a quiz from them."
-- Answer a question wrong on purpose to show the explanation, then answer one right.
-- Optional: "Make flashcards for the chain rule", then flip a card with the **Space** key.
-
-## 5. Email your professor (30 seconds)
-- Type: **"Email Dr. Chen asking if I can come to office hours Wednesday about my lab report"**
-> "Every student has stared at a blank email to a professor. Cuss finds the right professor and writes a polite,
-> specific email. I can edit it, and nothing sends until I press Send. It goes through Canvas Inbox."
-- Press **Send via Canvas**. (In the demo it goes nowhere.)
-
-## 5b. Your inbox, handled (30 seconds)
-- In the Today panel under **Messages**, click **Prof. Daniel Ortiz – Gilded Age reading quiz**.
-> "Cuss reads my Canvas inbox too. My history professor offered to reopen a quiz I missed. Cuss summarized it
-> and already drafted a reply saying yes."
-- Press **Send reply**. About 15 seconds later a pop-up appears: **New message from Prof. Daniel Ortiz**.
-> "And here's the professor writing back. Cuss alerts me the moment a professor replies, so nothing gets buried."
-- Tip: send the Dr. Chen email from step 5 first. Her reply arrives while you show the quiz, which feels like magic.
-
-## 6. The wow moment: voice mode (35 seconds)
-- Click the **sound-wave button** in the message bar.
-- Say: **"What should I work on tonight?"**
-- Let it answer out loud, then ask a follow-up: **"Remind me tomorrow at 6 to start my lab report."**
-> "It's like a friend who actually read the syllabus. You can do all of this while walking to class."
-
-## 7. Independent mode and the close (20 seconds)
-- Open **Settings** and show **Independent mode**, then the **What Cuss remembers** list.
-> "Turn on independent mode and Cuss checks Canvas every morning on its own, writes your daily plan, and makes study
-> sets before exams. It remembers you across every chat.
-> It works with any school on Canvas. We're starting at SF State, where we've already asked for official access.
-> **Cuss: your semester, handled.**"
+## Saturday night / Sunday morning checklist
+- [ ] **Devpost submitted before 9:00 AM Sunday.** Submit a draft tonight and keep editing (see `DEVPOST.md`). Add your teammates.
+- [ ] Hosted link works (Render). Open it at **10:15 AM** so the free server is awake.
+- [ ] Laptop charged. Chrome open at the app, full screen (⌘ + Shift + F), zoomed in once (⌘ +).
+- [ ] Phone with the **QR code** (`your-link/share`) ready to hand to judges, or a second laptop tab with it.
+- [ ] **Settings → Start the demo over** right before each judge arrives, signed in as yourself.
+- [ ] Microphone already allowed (click the mic once beforehand).
+- [ ] Backup video of a perfect run on your phone, in case the venue Wi-Fi ("Cal Hacks 13.0") fails.
 
 ---
 
-## Likely judge questions
-- **How does it connect to Canvas?** Through Canvas's official sign-in (OAuth2), the same way approved apps connect. Each school's Canvas admins approve the app once, and then students just log in.
-- **Can it really send and read messages?** Yes, through Canvas Inbox (Canvas also emails the professor). In the demo, the professors are simulated and messages stay inside the demo. With a real school account, they go to real people, and only after the student presses Send.
-- **Is student data safe?** Each student only sees their own data, nothing is shared between students, and students can delete their data and disconnect anytime. Emails never send without the student's approval unless they turn on auto-send.
-- **What about cheating?** Cuss is built to help students learn. It won't do graded work or answer live quizzes; it explains concepts, quizzes you on your notes, and helps you plan.
-- **What's the tech?** Node.js + Express, the Canvas REST API, and Claude (Anthropic) with tool use, so it decides which Canvas data to look up and shows each step live. Voice uses the browser's built-in speech recognition and text-to-speech.
-- **How does it make money / scale?** Free for students with a daily limit; paid for heavier use, or licensed by schools to improve retention. It works at any Canvas school with one approval per school.
-- **What's next?** Official approval at SF State, a mobile app with push notifications, Google Calendar sync, and study groups.
+## The 2-minute pitch
+
+**0:00 – The problem (15 s)**
+> "I'm Belal, an SF State student. Every semester I juggle five Canvas courses, and every one is set up differently. Last month I missed [a real example: a quiz, an announcement, a professor's email] that was sitting in Canvas the whole time. Canvas has everything, but it's a filing cabinet, not an assistant."
+
+**0:15 – What Cuss is (10 s)**
+> "Cuss is an AI assistant that signs in to your Canvas and handles your semester. Here it is, live."
+
+**0:25 – What's due + live steps (20 s)**
+Click **What's due?** and point at the step bubbles as they appear.
+> "It's checking my deadlines and reading my professors' announcements right now. You can see every step. And it caught that my quiz was moved."
+
+**0:45 – Inbox loop (30 s)**
+Under **Messages**, click **Prof. Ortiz**.
+> "My history professor offered to reopen a quiz I missed. Cuss summarized it and drafted a reply. Nothing sends until I approve it."
+
+Press **Send reply**.
+> "Professors usually answer, and Cuss alerts me the moment they do."
+(The demo professor replies in about 15 seconds. Keep talking; the pop-up will land during the next step.)
+
+**1:15 – Study from real notes (20 s)**
+Type: **"Quiz me for Quiz 5"**.
+> "It opened my actual biology notes from Canvas, not the internet, and made a quiz from them."
+Answer one question.
+
+**1:35 – Voice (15 s)**
+Tap **Talk** (or the sound-wave button) and ask: **"What should I work on tonight?"**
+
+**1:50 – Close (10 s)**
+> "Students sign in with their real school login. It's ready for SF State as soon as the school approves it, and it works at any Canvas school. Scan this to try it yourself."
+Hand over the QR code.
+
+---
+
+## For the Anthropic track: know where Claude can go wrong
+Judges will ask. Have these answers ready:
+- **Wrong or made-up deadlines:** Cuss never answers from memory. It calls Canvas tools every time and shows each step, so students can see where an answer came from. Dates come straight from the Canvas planner.
+- **Sending the wrong email to a professor:** every email and reply is a draft the student must approve. Auto-send is an opt-in with a warning.
+- **Academic dishonesty:** the system prompt tells Claude not to write graded work or answer live quizzes; it teaches, quizzes and plans instead.
+- **Privacy:** Claude only sees what the student already sees in Canvas. Students can delete their data and revoke access anytime.
+- **Running autonomously:** independent mode can read and draft, but never sends messages on its own.
+
+## Other likely questions
+- **Did you build this at Cal Hacks?** Yes, it was started at the event. The GitHub commit history shows it.
+- **How does it connect to Canvas?** Canvas's official OAuth2 sign-in through the school's SSO, the same way approved apps connect. Each school approves Cuss once, and then any student can log in.
+- **What's real and what's simulated?** The AI, the agent loop, the Canvas API integration and the sign-in are real. "Demo University" is a mock Canvas with sample classes, so we can demo without exposing a real student's data; it speaks the same API as real Canvas.
+- **What's next?** An SF State pilot, App Store and Google Play apps with push notifications, and calendar sync.

@@ -1,6 +1,13 @@
-# Devpost submission: Cuss
+# Devpost submission: Cuss (Cal Hacks 13.0)
 
-Copy each section into the matching Devpost field. Replace the `[brackets]`.
+Copy each section into the matching Devpost field. Replace the `[brackets]` with true details from your own experience.
+**Deadline: Sunday 9:00 AM.** Submit a draft Saturday night, then keep editing. Add every teammate on Devpost.
+
+## Prize tracks to select
+- **Anthropic** (built on Claude; see "Where Claude could go wrong" below)
+- **Best People-First Hack**
+- **Best Solo Hack** (only if you're competing alone)
+- **Microsoft: Built for the Real World** (production-minded AI agent for productivity)
 
 ---
 
@@ -8,7 +15,10 @@ Copy each section into the matching Devpost field. Replace the `[brackets]`.
 Cuss
 
 ## Tagline (short description)
-Your semester, handled: an AI assistant that reads your Canvas, tracks every deadline, emails your professors, and quizzes you on your actual course notes, by voice or text.
+Your semester, handled: an AI assistant for SF State students that reads your Canvas, tracks every deadline, handles your professor emails and inbox, and quizzes you on your actual course notes, by voice or text.
+
+## Thumbnail / gallery
+Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your own live run**: the Today panel, the live step bubbles, a quiz, the email card and voice mode.
 
 ## Links
 - **Try it:** [your Render link, e.g. https://cuss.onrender.com] (click "Try the live demo", no account needed)
@@ -21,6 +31,8 @@ Your semester, handled: an AI assistant that reads your Canvas, tracks every dea
 ---
 
 ## Inspiration
+**Who it's for:** SF State students: many of us commute, work jobs, and juggle four or five Canvas courses that are each organized differently. [Add one true sentence about your own experience, e.g. a missed quiz or a professor email you put off for a week.]
+
 Every student we know has missed something that was sitting in Canvas the whole time: a deadline buried in a module, an announcement that moved a quiz, a professor's message offering a second chance. Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Meanwhile, students juggle five courses, each organized differently, and writing a "professional" email to a professor can feel harder than the assignment itself.
 
 We wanted an assistant that already knows your semester: one you can just ask, "What should I work on tonight?"
@@ -38,6 +50,15 @@ Students sign in with their school's normal Canvas login, and Cuss takes it from
 
 Built for academic integrity: Cuss helps students learn and plan. It won't do graded work or answer live quizzes.
 
+It also installs like an app: on iPhone or Android, open the link and tap **Add to Home Screen**.
+
+## Where Claude could go wrong (and what we did about it)
+- **Hallucinated deadlines or facts:** Cuss is told never to answer from memory. It must call Canvas tools, and every tool call is shown to the student, so they can see where each answer came from.
+- **A wrong email to a professor:** every email and reply is a draft until the student presses Send. Auto-send is an opt-in with a warning, and the daily "independent mode" can draft but never send.
+- **Academic integrity:** Claude is instructed not to write graded work or answer live quizzes and exams; it explains, quizzes and plans instead.
+- **Privacy:** Claude sees only what the student can already see in Canvas, and students can delete their data and revoke access at any time.
+- **Cost and abuse:** per-student and global daily message caps.
+
 ## How we built it
 - **Backend:** Node.js + Express. Students authenticate with **Canvas OAuth2**, which redirects to the school's own SSO page, so Cuss never sees a password. Tokens refresh automatically, and each student's data is stored separately.
 - **AI agent:** **Claude (Anthropic)** with tool use. We gave the model tools that wrap the **Canvas REST API**: planner items, missing submissions, announcements, modules, pages, files (including PDFs read natively), instructors, and Canvas Inbox conversations. The model decides which tools to call, and we stream every step to the browser live.
@@ -45,7 +66,8 @@ Built for academic integrity: Cuss helps students learn and plan. It won't do gr
 - **Voice:** the browser's **Web Speech API** handles speech recognition and text-to-speech. Voice turns use a faster, lower-effort model setting so conversation feels natural.
 - **Background jobs:** a scheduler checks deadlines, new announcements and new inbox messages for each student and queues notifications. Independent mode runs a daily agent "check-in."
 - **Demo University:** a built-in mock Canvas that speaks the same OAuth2 and REST API as real Canvas, including professors who reply to your messages, so anyone can try the full experience without a school account.
-- **Frontend:** vanilla JS, HTML and CSS (no framework): streaming markdown, animations, dark/light themes, and a mobile layout.
+- **Frontend:** vanilla JS, HTML and CSS (no framework): streaming markdown, animations, dark/light themes, and an iOS-style phone layout with a tab bar. It's an installable PWA, and a Capacitor project is set up for App Store and Google Play builds.
+- **Hosting:** Render (one-click `render.yaml`) with a QR-code share page for judges.
 
 ## Challenges we ran into
 - **Schools lock down Canvas access.** Our own school disables personal API tokens, so we built proper OAuth2 sign-in, plus a full mock Canvas, so the product works end to end before official approval.
@@ -68,12 +90,12 @@ Built for academic integrity: Cuss helps students learn and plan. It won't do gr
 
 ## What's next for Cuss
 - **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
-- Mobile app with push notifications.
+- App Store and Google Play release with native push notifications (the Capacitor project is ready).
 - Google Calendar and school email (Gmail/Outlook) integration.
 - Study groups: shared flashcard decks and quiz battles for the same course.
 - Expansion to other Canvas schools: any school can enable Cuss with one approval.
 
 ---
 
-## Demo video tips (2 minutes or less)
-Follow `DEMO-SCRIPT.md`: the hook (10 s), What's due? with the live steps (20 s), quiz from real notes (25 s), email and inbox reply with the professor writing back (30 s), voice mode (25 s), close (10 s). Record with ⌘ + Shift + 5 and add captions.
+## Demo video (optional but recommended)
+Record your 2-minute table pitch from `DEMO-SCRIPT.md` with ⌘ + Shift + 5, upload it to YouTube (Unlisted), and paste the link. It doubles as your backup if the Wi-Fi fails during judging.

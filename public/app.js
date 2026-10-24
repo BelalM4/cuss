@@ -192,8 +192,10 @@ async function loadDashboard() {
     $("#statDue").textContent = week;
     $("#statMissing").textContent = missing.length;
     const urgent = soon + missing.length;
-    $("#todayBadge").textContent = urgent;
-    $("#todayBadge").classList.toggle("hidden", !urgent);
+    for (const id of ["#todayBadge", "#tabBadge"]) {
+      $(id).textContent = urgent;
+      $(id).classList.toggle("hidden", !urgent);
+    }
     $("#welcomeSub").innerHTML =
       soon || missing.length
         ? `You have <b>${soon} thing${soon === 1 ? "" : "s"} due in the next 48 hours</b>${missing.length ? ` and <b>${missing.length} missing</b>` : ""}. Want me to help you get ahead?`
@@ -322,7 +324,8 @@ async function openChat(id, { quiet = false } = {}) {
       else if (item.role === "user") addUserMessage(item.text);
       else addBotMessage().finish(item.text);
     }
-    scrollDown(true);
+    if (chat.display.length) scrollDown(true);
+    else $("#messages").scrollTop = 0;
     loadChatList();
     closePanels();
   } catch (err) {
@@ -1101,7 +1104,23 @@ function closePanels() {
   $("#sidebar").classList.remove("open");
   $("#today").classList.remove("open");
   $("#scrim").classList.remove("show");
+  setActiveTab("chat");
 }
+
+// Phone tab bar (iOS style).
+function setActiveTab(name) {
+  document.querySelectorAll("#tabbar button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
+}
+function openTab(name) {
+  if (name === "voice") return openVoiceMode();
+  if (name === "settings") return openSettings();
+  $("#sidebar").classList.toggle("open", name === "history");
+  $("#today").classList.toggle("open", name === "today");
+  $("#scrim").classList.remove("show");
+  setActiveTab(name);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+document.querySelectorAll("#tabbar button").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
 
 $("#composer").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -1143,6 +1162,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && state.voiceMode) closeVoiceMode();
 });
 if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = loadVoices;
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
 
 (async function init() {
   setSpeak(state.speakReplies);

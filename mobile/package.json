@@ -1,0 +1,20 @@
+{
+  "name": "cuss-mobile",
+  "private": true,
+  "description": "Native iOS and Android shells for Cuss (Capacitor). They load the hosted Cuss web app.",
+  "scripts": {
+    "icons": "npx @capacitor/assets generate --iconBackgroundColor '#0b0b14' --splashBackgroundColor '#0b0b14'",
+    "ios": "npx cap add ios && npx cap sync ios && npx cap open ios",
+    "android": "npx cap add android && npx cap sync android && npx cap open android",
+    "sync": "npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0"
+  }
+}

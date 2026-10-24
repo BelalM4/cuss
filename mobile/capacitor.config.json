@@ -1,0 +1,10 @@
+{
+  "appId": "app.cuss.study",
+  "appName": "Cuss",
+  "webDir": "www",
+  "server": {
+    "url": "https://YOUR-CUSS-APP.onrender.com",
+    "cleartext": false
+  },
+  "backgroundColor": "#0b0b14"
+}

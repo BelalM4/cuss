@@ -1,18 +1,16 @@
 {
-  "name": "Cuss for Canvas",
+  "name": "Cuss – your semester, handled",
   "short_name": "Cuss",
-  "description": "Your AI study assistant for Canvas.",
-  "start_url": "/login.html",
+  "description": "AI assistant for Canvas: deadlines, emails to professors, inbox, and study help.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f6f7fb",
-  "theme_color": "#4f46e5",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
+  "background_color": "#0b0b14",
+  "theme_color": "#0b0b14",
   "icons": [
-    {
-      "src": "/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
