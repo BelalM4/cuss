@@ -1,26 +1,27 @@
+# One-click hosting on Render (https://render.com): New + → Blueprint → pick this repo.
+# Only ANTHROPIC_API_KEY needs to be filled in; the public address is detected automatically.
 services:
   - type: web
     name: cuss
     runtime: node
-    buildCommand: npm ci
+    plan: free
+    buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /auth/info
     envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
       - key: NODE_VERSION
-        value: 20.12.2
+        value: "22"
       - key: HOST
         value: 0.0.0.0
       - key: DEMO_MODE
         value: "true"
+      - key: AI_EFFORT
+        value: low
+      - key: DAILY_MESSAGE_LIMIT
+        value: "40"
+      - key: DAILY_TOTAL_LIMIT
+        value: "400"
       - key: ALLOW_TOKEN_LOGIN
         value: "false"
-      - key: PUBLIC_URL
-        sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: CANVAS_URL
-        sync: false
-      - key: CANVAS_CLIENT_ID
-        sync: false
-      - key: CANVAS_CLIENT_SECRET
-        sync: false

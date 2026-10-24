@@ -1,52 +1,79 @@
-# Cuss for Canvas
+# Devpost submission: Cuss
 
-## What it does
+Copy each section into the matching Devpost field. Replace the `[brackets]`.
 
-Cuss is an AI study assistant that works directly with Canvas LMS. Instead of asking students to copy deadlines, course pages, or professor details into a separate chatbot, Cuss can look them up in Canvas and turn them into useful next steps:
+---
 
-- deadline and missing-work reminders
-- course-aware explanations from pages, assignments, files, and syllabi
-- grounded flashcards and practice quizzes
-- instructor email drafts sent through Canvas Inbox
-- saved conversations and long-term study preferences
-- voice input, voice replies, calendar export, and an optional daily briefing
+## Project name
+Cuss
 
-Judges can try the full product through the built-in Demo University flow without a school account. Demo students get isolated sample courses, deadlines, professors, and course content; demo messages never leave the app.
-
-## How it is built
-
-- **Frontend:** vanilla HTML, CSS, and JavaScript for a fast, responsive app that works on desktop and mobile.
-- **Backend:** Node.js and Express.
-- **AI:** Anthropic Claude with tool use and streamed newline-delimited JSON responses.
-- **Learning data:** Canvas REST API through OAuth 2.0, with automatic token refresh.
-- **Storage:** per-student JSON files on the server, isolated by Canvas user ID.
-- **Deployment:** Render-compatible Node service with a PWA manifest and service worker for installable mobile use.
-
-The assistant uses explicit tools for Canvas lookups, course-material reading, memory, reminders, study sets, and email drafting. It does not invent course IDs or claim an email was sent when it is only a draft.
-
-## Why we built it
-
-Students already have the information they need, but it is scattered across Canvas announcements, modules, assignments, files, Inbox, and calendar views. Cuss makes the information conversational while keeping the student in control of consequential actions like sending an email.
-
-## Challenges
-
-The hardest parts were making the assistant useful without making it careless:
-
-1. **Reliable grounding:** the model must read the actual course material before teaching from it.
-2. **Safe actions:** emails are drafts by default and only send after a student review; independent check-ins never send email.
-3. **Canvas complexity:** OAuth, token refresh, pagination, different item types, file downloads, and per-course permissions all need to work together.
-4. **Privacy boundaries:** each student's chats, memory, settings, and Canvas token stay in that student's data directory.
-5. **A judge-friendly demo:** the demo school mirrors the Canvas API so the entire product can be tested without real student credentials.
-
-## What is next
-
-- production hosting with a persistent encrypted database
-- native iOS and Android wrappers with store-ready signing and push notifications
-- school-admin onboarding and Canvas Developer Key templates
-- richer assignment workflows and instructor-approved integrations
-- accessibility review, analytics with consent, and expanded privacy controls
+## Tagline (short description)
+Your semester, handled: an AI assistant that reads your Canvas, tracks every deadline, emails your professors, and quizzes you on your actual course notes, by voice or text.
 
 ## Links
+- **Try it:** [your Render link, e.g. https://cuss.onrender.com] (click "Try the live demo", no account needed)
+- **Code:** https://github.com/BelalM4/cuss
+- **Demo video:** [YouTube link]
 
-- Demo/share page: `https://YOUR-RENDER-URL.onrender.com/share`
-- Source: `https://github.com/BelalM4/cuss`
+## Built with (tags)
+`node.js` `express` `javascript` `html` `css` `canvas-lms` `canvas-api` `oauth2` `claude` `anthropic` `web-speech-api` `render`
+
+---
+
+## Inspiration
+Every student we know has missed something that was sitting in Canvas the whole time: a deadline buried in a module, an announcement that moved a quiz, a professor's message offering a second chance. Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Meanwhile, students juggle five courses, each organized differently, and writing a "professional" email to a professor can feel harder than the assignment itself.
+
+We wanted an assistant that already knows your semester: one you can just ask, "What should I work on tonight?"
+
+## What it does
+Students sign in with their school's normal Canvas login, and Cuss takes it from there:
+
+- **Never miss a deadline.** A "Today" dashboard shows what's due this week, missing work and grades. Cuss sends reminders days and hours before anything unsubmitted is due, and exports every deadline to Google/Apple/Outlook Calendar.
+- **Your inbox, handled.** Cuss reads your Canvas Inbox, summarizes what professors need from you, and drafts replies. You get an alert the moment a professor writes back.
+- **Emails to professors.** Ask "email my bio professor about office hours" and Cuss finds the right instructor and writes a polite, specific message. Nothing is sent until you press Send.
+- **Study from your real notes.** Cuss opens your actual course pages, PDFs and syllabus, explains the material, and builds interactive flashcards and practice quizzes from them, instead of from random internet content.
+- **Talk to it.** A full-screen voice mode lets you have a hands-free conversation, like a friend who actually read the syllabus.
+- **It remembers you and can work on its own.** Chats are saved, Cuss keeps long-term notes (your major, how you like to study), and "independent mode" checks Canvas every morning to write your daily briefing and study plan.
+- **Live agent transparency.** As Cuss works, you see each step ("Checked deadlines ✓", "Read 'Week 8: Cell Membrane' ✓"), so students can trust where answers come from.
+
+Built for academic integrity: Cuss helps students learn and plan. It won't do graded work or answer live quizzes.
+
+## How we built it
+- **Backend:** Node.js + Express. Students authenticate with **Canvas OAuth2**, which redirects to the school's own SSO page, so Cuss never sees a password. Tokens refresh automatically, and each student's data is stored separately.
+- **AI agent:** **Claude (Anthropic)** with tool use. We gave the model tools that wrap the **Canvas REST API**: planner items, missing submissions, announcements, modules, pages, files (including PDFs read natively), instructors, and Canvas Inbox conversations. The model decides which tools to call, and we stream every step to the browser live.
+- **Interactive cards:** tools like `make_quiz`, `make_flashcards`, `draft_email` and `draft_reply` return structured data that the frontend renders as quiz, flashcard and email UIs, rather than walls of text.
+- **Voice:** the browser's **Web Speech API** handles speech recognition and text-to-speech. Voice turns use a faster, lower-effort model setting so conversation feels natural.
+- **Background jobs:** a scheduler checks deadlines, new announcements and new inbox messages for each student and queues notifications. Independent mode runs a daily agent "check-in."
+- **Demo University:** a built-in mock Canvas that speaks the same OAuth2 and REST API as real Canvas, including professors who reply to your messages, so anyone can try the full experience without a school account.
+- **Frontend:** vanilla JS, HTML and CSS (no framework): streaming markdown, animations, dark/light themes, and a mobile layout.
+
+## Challenges we ran into
+- **Schools lock down Canvas access.** Our own school disables personal API tokens, so we built proper OAuth2 sign-in, plus a full mock Canvas, so the product works end to end before official approval.
+- **Making an agent feel fast.** Multi-step tool use can feel slow, so we stream text and show each tool step live, run independent tools in parallel, and tune the model's effort for voice versus typed questions.
+- **Safety with real email.** An AI that can message professors needs guardrails: every email and reply is a draft until the student approves it, and auto-send is a clearly labeled opt-in.
+- **Saving conversations correctly.** Persisting the full agent history (tool calls, results and UI cards) so chats can be reopened and continued, without the steps getting out of order.
+- **Voice in the browser.** Handling speech recognition and speech synthesis quirks across browsers (missing end events, long-utterance cutoffs).
+
+## Accomplishments that we're proud of
+- A complete loop in one product: deadlines → study → email → professor replies → alerts.
+- Real Canvas OAuth2 integration that works with any school's SSO.
+- Quizzes and flashcards generated from the student's *actual* course material, with the source shown.
+- A voice mode that makes a study assistant feel like a conversation.
+- An AI that shows its work: every step is visible.
+
+## What we learned
+- How Canvas's OAuth2, planner, modules and conversations APIs fit together, and why schools gate API access.
+- How to design tools for an LLM agent so its outputs become rich UI, not just text.
+- That trust matters most for student-facing AI: showing the steps, citing the course material, and never sending anything without consent.
+
+## What's next for Cuss
+- **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
+- Mobile app with push notifications.
+- Google Calendar and school email (Gmail/Outlook) integration.
+- Study groups: shared flashcard decks and quiz battles for the same course.
+- Expansion to other Canvas schools: any school can enable Cuss with one approval.
+
+---
+
+## Demo video tips (2 minutes or less)
+Follow `DEMO-SCRIPT.md`: the hook (10 s), What's due? with the live steps (20 s), quiz from real notes (25 s), email and inbox reply with the professor writing back (30 s), voice mode (25 s), close (10 s). Record with ⌘ + Shift + 5 and add captions.

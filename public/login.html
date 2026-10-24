@@ -3,46 +3,63 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Log in · Cuss for Canvas</title>
-  <meta name="theme-color" content="#4f46e5" />
+  <title>Cuss · Your semester, handled</title>
+  <meta name="theme-color" content="#0b0b14" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236366f1'/><stop offset='.55' stop-color='%23a855f7'/><stop offset='1' stop-color='%23ec4899'/></linearGradient></defs><rect width='100' height='100' rx='28' fill='url(%23g)'/><text x='50' y='69' font-size='56' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='800'>C</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="login-page">
-  <main class="login-card">
-    <img class="logo big" src="/logo.svg" alt="Cuss" />
-    <h1>Cuss <span>for Canvas</span></h1>
-    <p class="tagline">Your AI study assistant — deadlines, emails to professors, and study help, all from your Canvas.</p>
+  <div class="landing">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
 
-    <a class="sso-btn hidden" id="ssoBtn" href="/auth/login">
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 6a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 14c-2.67-.85-4.85-2.86-5.83-5.4C7.6 14.6 10.03 14 12 14s4.4.6 5.83 1.6c-.98 2.54-3.16 4.55-5.83 5.4Z"/></svg>
-      <span id="ssoLabel">Log in with Canvas</span>
-    </a>
-    <p class="fine hidden" id="ssoFine">You'll sign in on your school's usual login page. Cuss never sees your password.</p>
+    <section class="hero">
+      <span class="eyebrow"><i data-icon="sparkles" data-size="15"></i>AI assistant for Canvas</span>
+      <h1>Your semester,<br /><span class="grad-text">handled.</span></h1>
+      <p class="lead">Cuss connects to your Canvas, keeps track of every deadline, writes emails to your professors, and turns your course notes into quizzes. Just talk to it.</p>
+      <div class="features">
+        <div class="feature"><div class="fi"><i data-icon="clock"></i></div><div><b>Never miss a deadline</b><span>Smart reminders days and hours before due dates</span></div></div>
+        <div class="feature"><div class="fi"><i data-icon="mail"></i></div><div><b>Emails to professors</b><span>Polite, specific, sent through Canvas Inbox</span></div></div>
+        <div class="feature"><div class="fi"><i data-icon="layers"></i></div><div><b>Study from your notes</b><span>Flashcards &amp; quizzes from your actual course pages</span></div></div>
+        <div class="feature"><div class="fi"><i data-icon="wave"></i></div><div><b>Hands-free voice</b><span>Talk to it like a friend who read the syllabus</span></div></div>
+      </div>
+    </section>
 
-    <a class="demo-btn hidden" id="demoBtn" href="/auth/demo">▶ Try the demo <span>— a sample student at "Demo University", no school account needed</span></a>
+    <main class="login-card">
+      <div class="logo big">C</div>
+      <h2>Welcome to Cuss</h2>
+      <p class="tagline">Sign in with your school's Canvas to get started.</p>
 
-    <div class="notice hidden" id="notReady"></div>
-    <p class="form-error hidden" id="error"></p>
+      <a class="sso-btn hidden" id="ssoBtn" href="/auth/login">
+        <i data-icon="logout"></i><span id="ssoLabel">Log in with Canvas</span>
+      </a>
 
-    <details class="token-login hidden" id="tokenBox">
-      <summary>Use a Canvas access token instead</summary>
-      <form id="tokenForm">
-        <p class="fine">Canvas → Account → Settings → <b>+ New Access Token</b>. (Some schools turn this off.)</p>
-        <input name="token" type="password" placeholder="Paste access token" autocomplete="off" required />
-        <button class="btn" type="submit">Log in</button>
-      </form>
-    </details>
+      <a class="demo-btn hidden" id="demoBtn" href="/auth/demo">
+        <span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
+        <span><b>Try the live demo</b><span>Sample student at “Demo University”. No account needed.</span></span>
+      </a>
 
-    <ul class="perks">
-      <li>📌 Reminders before things are due</li>
-      <li>✉️ Polite emails to your professors</li>
-      <li>🧠 Flashcards &amp; quizzes from your course files</li>
-      <li>🎤 Talk to it with your voice</li>
-    </ul>
-  </main>
+      <div class="notice hidden" id="notReady"></div>
+      <p class="form-error hidden" id="error"></p>
 
+      <details class="token-login hidden" id="tokenBox">
+        <summary>Use a Canvas access token instead</summary>
+        <form id="tokenForm">
+          <p class="fine">Canvas → Account → Settings → <b>+ New Access Token</b>. (Some schools turn this off.)</p>
+          <input name="token" type="password" placeholder="Paste access token" autocomplete="off" required />
+          <button class="btn" type="submit">Log in</button>
+        </form>
+      </details>
+
+      <p class="login-foot">You sign in on your school's own login page. Cuss never sees your password.</p>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
   <script type="module">
     const $ = (s) => document.querySelector(s);
     const err = new URLSearchParams(location.search).get("error");
@@ -57,14 +74,18 @@
     const info = await fetch("/auth/info").then((r) => r.json());
     if (info.sso) {
       $("#ssoBtn").classList.remove("hidden");
-      $("#ssoFine").classList.remove("hidden");
       $("#ssoLabel").textContent = `Log in with ${info.schoolName === "Canvas" ? "Canvas" : info.schoolName + " Canvas"}`;
-    } else {
+    }
+    if (info.demo) {
+      $("#demoBtn").classList.remove("hidden");
+      // With no school login yet, the demo is the main way in.
+      if (!info.sso) $("#demoBtn").classList.add("primary");
+    }
+    if (!info.sso) {
       $("#notReady").innerHTML =
-        "<b>Canvas login isn't switched on yet.</b> The person running this app needs a developer key from the school's Canvas admins (see <code>ADMIN-REQUEST.md</code>).";
+        "<b>School login coming soon.</b> Canvas sign-in turns on once the school approves Cuss (see <code>ADMIN-REQUEST.md</code>).";
       $("#notReady").classList.remove("hidden");
     }
-    if (info.demo) $("#demoBtn").classList.remove("hidden");
     if (info.tokenLogin) {
       $("#tokenBox").classList.remove("hidden");
       if (!info.sso && !info.demo) $("#tokenBox").open = true;
@@ -87,6 +108,9 @@
       btn.disabled = false;
       btn.textContent = "Log in";
     });
+  </script>
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
   </script>
 </body>
 </html>

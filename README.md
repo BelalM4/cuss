@@ -3,6 +3,7 @@
 A personal AI assistant for school. Students click **"Log in with SFSU Canvas"**, sign in on the usual school login page, and Cuss:
 
 - **Reminds them about due dates.** It alerts them 3 days, 1 day and 3 hours before anything unsubmitted is due (adjustable) and when there's a new announcement. A one-click calendar export covers Google, Apple and Outlook.
+- **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. You also get an alert when a professor writes back.
 - **Writes emails to professors.** It finds the right instructor or TA, writes a polite message, and sends it through Canvas Inbox when the student presses **Send** (or says *"send it"*).
 - **Helps them study.** It reads their actual course pages, files (PDFs too), assignments and syllabus, explains topics, and makes **flashcards** and **practice quizzes**.
 - **Remembers them.** Saved chats appear in the sidebar, and long-term notes about the student (major, study style…) carry across chats.
@@ -34,6 +35,15 @@ Canvas only lets an app use the school's login page once the school's Canvas adm
 3. Restart the app. The terminal says **"✓ Canvas SSO login is on"**, and the login button works.
 
 Until then, the login page shows **"Use a Canvas access token instead"**. That works at schools that allow personal tokens, or with a token an SFSU admin generates for you.
+
+### Quick public demo (for hackathons and judges)
+This repo includes a `render.yaml`, so you can host the demo free on [Render](https://render.com):
+1. Sign up at render.com with your GitHub account.
+2. Click **New + → Blueprint**, pick this repo, and click **Apply**.
+3. When asked, paste your `ANTHROPIC_API_KEY`. Everything else is preset: demo mode, a fast AI setting, and daily message caps (40 per visitor, 400 total) to protect your bill.
+4. Your link appears at the top (like `https://cuss.onrender.com`). Open **`/share`** on it for a big QR code to show on screen.
+
+The free plan sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute. Open the link a few minutes before judging (or upgrade to the $7 plan for the day).
 
 ### 3. Share it with other students (hosting)
 Running it on your laptop lets you use it yourself. For other students, it needs to run on a server with a public `https://` address, for example Render, Railway or Fly.io:
@@ -90,4 +100,6 @@ Things to try:
 - `lib/agent.js`: the AI assistant (Claude) and its tools.
 - `lib/chats.js`: saved chats, email drafts, long-term memory.
 - `lib/reminders.js`: background reminders, announcements, independent-mode briefings, calendar feed.
-- `public/`: the web app (`login.html`, chat, dashboard, voice).
+- `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes).
+
+Presenting Cuss? See **`DEMO-SCRIPT.md`** for a 3-minute walkthrough and a pre-demo checklist.

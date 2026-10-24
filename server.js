@@ -1,9 +1,9 @@
 import "./lib/env.js";
 import express from "express";
 import crypto from "node:crypto";
+import QRCode from "qrcode";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import QRCode from "qrcode";
 import * as canvas from "./lib/canvas.js";
 import { chat, describeError } from "./lib/agent.js";
 import * as chats from "./lib/chats.js";
@@ -19,8 +19,10 @@ import {
   deleteUserData,
   getState,
   saveState,
+  readAppJson,
+  writeAppJson,
 } from "./lib/store.js";
-import { startReminderLoop, notificationsSince, checkReminders, deadlinesIcs, runBriefing } from "./lib/reminders.js";
+import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -57,59 +59,15 @@ const wrap = (fn) => async (req, res) => {
   }
 };
 
-const escapeHtml = (value) =>
-  String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
-
-app.get(
-  "/share",
-  wrap(async (req, res) => {
-    const url = `${serverConfig().publicUrl}/login.html`;
-    const qr = await QRCode.toDataURL(url, {
-      errorCorrectionLevel: "M",
-      margin: 2,
-      width: 720,
-      color: { dark: "#171821", light: "#ffffff" },
-    });
-    res.type("html").send(`<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#4f46e5">
-  <title>Try Cuss for Canvas</title>
-  <link rel="icon" href="/logo.svg" type="image/svg+xml">
-  <style>
-    :root{color-scheme:light;background:#f6f7fb;color:#171821;font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
-    main{width:min(760px,100%);text-align:center;background:#fff;border:1px solid #e4e6ef;border-radius:28px;padding:clamp(24px,6vw,56px);box-shadow:0 18px 60px #10182816}
-    .brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:20px}.brand img{width:38px;height:38px}
-    h1{font-size:clamp(32px,6vw,58px);line-height:1.05;letter-spacing:-.04em;margin:28px 0 12px}
-    p{color:#6b6f85;margin:0 auto 24px;max-width:560px}.qr{width:min(72vw,420px);height:auto;border-radius:18px;border:12px solid #fff;box-shadow:0 8px 30px #1018281c}
-    .url{display:inline-block;margin-top:20px;color:#4f46e5;font-weight:700;word-break:break-all}.hint{font-size:14px;margin-top:14px}
-    .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:26px}a{color:inherit}
-    .button{display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;font-weight:700;padding:11px 18px;border-radius:12px}
-    .button.secondary{background:#eef0ff;color:#4f46e5}
-  </style>
-</head>
-<body>
-  <main>
-    <div class="brand"><img src="/logo.svg" alt=""><span>Cuss for Canvas</span></div>
-    <h1>Your semester, handled.</h1>
-    <p>Scan to try the AI study assistant that turns Canvas deadlines, course materials, and professor emails into one calm workspace.</p>
-    <img class="qr" src="${qr}" alt="QR code for ${escapeHtml(url)}">
-    <a class="url" href="${escapeHtml(url)}">${escapeHtml(url)}</a>
-    <p class="hint">No school account? Choose <b>Try the demo</b> on the next screen.</p>
-    <div class="actions">
-      <a class="button" href="/login.html">Open Cuss</a>
-      <a class="button secondary" href="https://github.com/BelalM4/cuss">View the code</a>
-    </div>
-  </main>
-</body>
-</html>`);
-  }),
-);
-
 // --- Login ---------------------------------------------------------------------
+
+// QR code pointing at this app, for "scan to try it" on a slide or poster.
+app.get("/qr.svg", async (req, res) => {
+  const svg = await QRCode.toString(serverConfig().publicUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+  res.type("image/svg+xml").set("Cache-Control", "no-cache").send(svg);
+});
+app.get("/share", (req, res) => res.sendFile(path.join(here, "public", "share.html")));
+app.get("/share-info", (req, res) => res.json({ url: serverConfig().publicUrl }));
 
 // What the login page needs to know (no secrets).
 app.get("/auth/info", (req, res) => {
@@ -152,7 +110,7 @@ app.get("/auth/callback", async (req, res) => {
   try {
     const userId = await auth.finishLogin(String(code), { demo: String(state).endsWith(".demo") });
     auth.startSession(res, userId);
-    runAsUser(userId, () => checkReminders().catch(() => {}));
+    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.redirect("/");
   } catch (err) {
     console.error(err);
@@ -177,7 +135,7 @@ app.post(
       saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "" }),
     );
     auth.startSession(res, userId);
-    runAsUser(userId, () => checkReminders().catch(() => {}));
+    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.json({ ok: true });
   }),
 );
@@ -265,6 +223,12 @@ app.get(
   }),
 );
 
+// Unread Canvas Inbox messages for the Today panel.
+app.get(
+  "/api/inbox",
+  wrap(async (req, res) => res.json(await canvas.listConversations({ scope: "unread", limit: 5 }))),
+);
+
 app.get(
   "/calendar.ics",
   wrap(async (req, res) => {
@@ -320,6 +284,17 @@ app.post("/api/chat", async (req, res) => {
   if (state.usageCount >= limit) {
     return res.status(429).json({ error: `You've reached today's limit of ${limit} messages. It resets tomorrow.` });
   }
+  // ...and an overall cap, since demo visitors each count as a new student.
+  const totalLimit = Number(process.env.DAILY_TOTAL_LIMIT) || 0;
+  if (totalLimit) {
+    const usage = readAppJson("usage.json", {});
+    if (usage.day !== today) Object.assign(usage, { day: today, count: 0 });
+    if (usage.count >= totalLimit) {
+      return res.status(429).json({ error: "Cuss has hit today's demo limit. Thanks for trying it! It resets tomorrow." });
+    }
+    usage.count++;
+    writeAppJson("usage.json", usage);
+  }
   state.usageCount++;
   saveState(state);
   res.setHeader("Content-Type", "application/x-ndjson");
@@ -345,13 +320,17 @@ app.post(
     if (draft.status === "sent") return res.json({ ok: true, alreadySent: true });
     const subject = String(req.body?.subject ?? draft.subject).trim();
     const body = String(req.body?.body ?? draft.body).trim();
-    if (!subject || !body) return res.status(400).json({ error: "Subject and message can't be empty." });
-    await canvas.sendMessage({
-      courseId: draft.courseId,
-      recipientIds: draft.recipients.map((r) => r.id),
-      subject,
-      body,
-    });
+    if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
+    if (draft.kind === "reply") {
+      await canvas.replyToConversation(draft.conversationId, body);
+    } else {
+      await canvas.sendMessage({
+        courseId: draft.courseId,
+        recipientIds: draft.recipients.map((r) => r.id),
+        subject,
+        body,
+      });
+    }
     Object.assign(draft, { status: "sent", subject, body });
     chats.saveDraft(draft);
     chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
@@ -366,7 +345,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 app.listen(PORT, HOST, () => {
   const s = serverConfig();
   console.log(`\n  Cuss for Canvas is running → ${s.publicUrl}`);
-  if (!s.canvasUrl) console.log("  ⚠  Set CANVAS_URL in .env (e.g. https://sfsu.instructure.com)");
+  if (!s.canvasUrl) console.log(s.demo ? "  ⓘ No CANVAS_URL set: running with the demo school only" : "  ⚠  Set CANVAS_URL in .env (e.g. https://sfsu.instructure.com)");
   if (!s.anthropicKey) console.log("  ⚠  Set ANTHROPIC_API_KEY in .env");
   console.log(ssoEnabled() ? "  ✓ Canvas SSO login is on" : "  ⓘ Canvas SSO login is off until CANVAS_CLIENT_ID / CANVAS_CLIENT_SECRET are set");
   console.log("");
