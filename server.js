@@ -3,6 +3,7 @@ import express from "express";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import QRCode from "qrcode";
 import * as canvas from "./lib/canvas.js";
 import { chat, describeError } from "./lib/agent.js";
 import * as chats from "./lib/chats.js";
@@ -55,6 +56,58 @@ const wrap = (fn) => async (req, res) => {
     res.status(err.status && err.status < 600 ? err.status : 500).json({ error: describeError(err) });
   }
 };
+
+const escapeHtml = (value) =>
+  String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+
+app.get(
+  "/share",
+  wrap(async (req, res) => {
+    const url = `${serverConfig().publicUrl}/login.html`;
+    const qr = await QRCode.toDataURL(url, {
+      errorCorrectionLevel: "M",
+      margin: 2,
+      width: 720,
+      color: { dark: "#171821", light: "#ffffff" },
+    });
+    res.type("html").send(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Try Cuss for Canvas</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <style>
+    :root{color-scheme:light;background:#f6f7fb;color:#171821;font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
+    main{width:min(760px,100%);text-align:center;background:#fff;border:1px solid #e4e6ef;border-radius:28px;padding:clamp(24px,6vw,56px);box-shadow:0 18px 60px #10182816}
+    .brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:20px}.brand img{width:38px;height:38px}
+    h1{font-size:clamp(32px,6vw,58px);line-height:1.05;letter-spacing:-.04em;margin:28px 0 12px}
+    p{color:#6b6f85;margin:0 auto 24px;max-width:560px}.qr{width:min(72vw,420px);height:auto;border-radius:18px;border:12px solid #fff;box-shadow:0 8px 30px #1018281c}
+    .url{display:inline-block;margin-top:20px;color:#4f46e5;font-weight:700;word-break:break-all}.hint{font-size:14px;margin-top:14px}
+    .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:26px}a{color:inherit}
+    .button{display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;font-weight:700;padding:11px 18px;border-radius:12px}
+    .button.secondary{background:#eef0ff;color:#4f46e5}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand"><img src="/logo.svg" alt=""><span>Cuss for Canvas</span></div>
+    <h1>Your semester, handled.</h1>
+    <p>Scan to try the AI study assistant that turns Canvas deadlines, course materials, and professor emails into one calm workspace.</p>
+    <img class="qr" src="${qr}" alt="QR code for ${escapeHtml(url)}">
+    <a class="url" href="${escapeHtml(url)}">${escapeHtml(url)}</a>
+    <p class="hint">No school account? Choose <b>Try the demo</b> on the next screen.</p>
+    <div class="actions">
+      <a class="button" href="/login.html">Open Cuss</a>
+      <a class="button secondary" href="https://github.com/BelalM4/cuss">View the code</a>
+    </div>
+  </main>
+</body>
+</html>`);
+  }),
+);
 
 // --- Login ---------------------------------------------------------------------
 
@@ -173,11 +226,25 @@ app.post(
   wrap(async (req, res) => {
     const { reminderHours, independent, briefingTime, timeZone, autoSendEmails } = req.body || {};
     const patch = {};
-    if (Array.isArray(reminderHours)) patch.reminderHours = reminderHours.map(Number).filter((h) => h > 0);
+    if (Array.isArray(reminderHours)) {
+      const hours = reminderHours.map(Number).filter((h) => Number.isFinite(h) && h > 0);
+      if (!hours.length) return res.status(400).json({ error: "Enter at least one positive reminder interval." });
+      patch.reminderHours = hours;
+    }
     if (typeof independent === "boolean") patch.independent = independent;
     if (typeof autoSendEmails === "boolean") patch.autoSendEmails = autoSendEmails;
-    if (/^\d{2}:\d{2}$/.test(briefingTime || "")) patch.briefingTime = briefingTime;
-    if (timeZone) patch.timeZone = String(timeZone);
+    if (briefingTime !== undefined) {
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(briefingTime)) return res.status(400).json({ error: "Enter a valid briefing time." });
+      patch.briefingTime = briefingTime;
+    }
+    if (timeZone !== undefined) {
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: String(timeZone) }).format();
+      } catch {
+        return res.status(400).json({ error: "Enter a valid time zone." });
+      }
+      patch.timeZone = String(timeZone);
+    }
     saveConfig(patch);
     res.json({ ok: true });
   }),

@@ -42,6 +42,15 @@ Running it on your laptop lets you use it yourself. For other students, it needs
 - Ask the Canvas admins to add `https://your-app-address/auth/callback` as a redirect URI on the Developer Key.
 - Expect your school to ask about student-data privacy (FERPA). `ADMIN-REQUEST.md` explains how data is handled.
 
+#### Fast hackathon deployment on Render
+
+1. Create a new **Web Service** from this repository.
+2. Render can use the included `render.yaml`; otherwise use `npm ci` as the build command and `npm start` as the start command.
+3. Set `PUBLIC_URL` to the exact Render URL, `ANTHROPIC_API_KEY` to the server's key, and `DATA_DIR` to a persistent disk path if you need logins to survive deploys.
+4. Open `https://your-app-address/share` to show the judge QR code. It points to the login page, where judges can choose **Try the demo** without a Canvas account.
+
+The included `manifest.webmanifest`, `sw.js`, and `logo.svg` make the judge experience installable as a PWA on supported browsers. A native iOS/Android wrapper can use the same hosted URL after the hackathon; store submission still requires platform accounts, signing, privacy disclosures, and review.
+
 ---
 
 ## Using it (for students)
