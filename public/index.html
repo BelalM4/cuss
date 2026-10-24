@@ -3,106 +3,152 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Cuss for Canvas</title>
-  <meta name="theme-color" content="#4f46e5" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%234f46e5'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'>C</text></svg>" />
+  <title>Cuss · Your Canvas study assistant</title>
+  <meta name="theme-color" content="#0b0b14" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236366f1'/><stop offset='.55' stop-color='%23a855f7'/><stop offset='1' stop-color='%23ec4899'/></linearGradient></defs><rect width='100' height='100' rx='28' fill='url(%23g)'/><text x='50' y='69' font-size='56' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='800'>C</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">C</div>
-      <div>
-        <div class="brand-name">Cuss <span>for Canvas</span></div>
-        <div class="greeting" id="greeting">Your study assistant</div>
-      </div>
-    </div>
-    <div class="top-actions">
-      <button class="icon-btn mobile-only" id="dashToggle" title="Deadlines">📅<span class="badge hidden" id="dashBadge"></span></button>
-      <button class="pill-toggle" id="speakToggle" aria-pressed="false" title="Read replies out loud">🔈 <span>Voice replies</span></button>
-      <button class="icon-btn" id="newChatBtn" title="New chat">＋</button>
-      <button class="icon-btn" id="settingsBtn" title="Settings">⚙︎</button>
-    </div>
-  </header>
-
-  <div class="layout">
-    <aside class="dashboard" id="dashboard">
-      <section>
-        <div class="section-head">
-          <h2>Due soon</h2>
-          <button class="link-btn" id="refreshBtn" title="Refresh">↻</button>
+  <div class="app">
+    <!-- Left: chats -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div class="brand-text">
+          <div class="brand-name">Cuss</div>
+          <div class="brand-sub" id="schoolLine">for Canvas</div>
         </div>
-        <div id="missingList"></div>
-        <ul class="deadlines" id="deadlineList"><li class="muted">Connect Canvas to see deadlines.</li></ul>
-        <a class="calendar-link" href="/calendar.ics" id="calLink">⤓ Add deadlines to my calendar</a>
-      </section>
-      <section>
-        <div class="section-head"><h2>Chats</h2><button class="link-btn" id="newChatBtn2" title="New chat">＋</button></div>
-        <ul class="chat-list" id="chatList"><li class="muted small">Your conversations will be saved here.</li></ul>
-      </section>
-      <section>
-        <div class="section-head"><h2>Courses</h2></div>
-        <ul class="courses" id="courseList"></ul>
-      </section>
-      <section class="notify-box hidden" id="notifyBox">
-        <p>Turn on notifications so I can remind you before things are due.</p>
-        <button class="btn small" id="enableNotify">Enable reminders</button>
-      </section>
+      </div>
+      <button class="new-chat" id="newChatBtn"><i data-icon="plus"></i>New chat</button>
+      <div class="side-label">Recent</div>
+      <ul class="chat-list" id="chatList"></ul>
+      <div class="side-foot">
+        <div class="avatar" id="avatar">?</div>
+        <div class="who">
+          <div class="who-name" id="whoName">Student</div>
+          <div class="who-sub" id="whoSub">Canvas</div>
+        </div>
+        <button class="icon-btn ghost" id="settingsBtn" title="Settings"><i data-icon="settings"></i></button>
+      </div>
     </aside>
+    <div class="scrim" id="scrim"></div>
 
+    <!-- Middle: conversation -->
     <main class="chat">
-      <div class="messages" id="messages">
-        <div class="welcome" id="welcome">
-          <h1 id="welcomeTitle">Hi! What can I help with?</h1>
-          <p>I'm connected to your Canvas. Ask me anything — or tap the mic and just talk.</p>
-          <div class="chips">
-            <button class="chip" data-prompt="What's due this week? Anything missing?">📌 What's due this week?</button>
-            <button class="chip" data-prompt="Help me write an email to one of my professors.">✉️ Email a professor</button>
-            <button class="chip" data-prompt="Quiz me on the latest topic in one of my courses.">🧠 Quiz me</button>
-            <button class="chip" data-prompt="Make me flashcards from the most recent module in one of my courses.">🃏 Make flashcards</button>
-            <button class="chip" data-prompt="Make me a study plan for the next 7 days based on my deadlines.">🗓️ Plan my week</button>
-            <button class="chip" data-prompt="Any new announcements from my classes?">📣 Announcements</button>
-          </div>
+      <header class="chat-head">
+        <button class="icon-btn ghost only-mobile" id="menuBtn" title="Chats"><i data-icon="menu"></i></button>
+        <div class="chat-title" id="chatTitle">New chat</div>
+        <div class="head-actions">
+          <span class="demo-pill hidden" id="demoPill">DEMO</span>
+          <button class="toggle" id="speakToggle" aria-pressed="false" title="Read replies out loud"><i data-icon="volume"></i><span>Voice replies</span></button>
+          <button class="icon-btn ghost only-narrow" id="todayBtn" title="Today"><i data-icon="calendar"></i><span class="badge hidden" id="todayBadge"></span></button>
         </div>
+      </header>
+
+      <div class="messages" id="messages">
+        <section class="welcome" id="welcome">
+          <div class="orb small-orb"><span></span></div>
+          <h1 id="welcomeTitle">Hey there 👋</h1>
+          <p class="welcome-sub" id="welcomeSub">I'm connected to your Canvas. Ask me anything, or tap the mic and just talk.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="What's due this week? Anything missing?"><i data-icon="clock"></i><b>What's due?</b><span>Deadlines &amp; missing work</span></button>
+            <button class="suggestion" data-prompt="Help me write an email to one of my professors."><i data-icon="mail"></i><b>Email a professor</b><span>Polite, clear, ready to send</span></button>
+            <button class="suggestion" data-prompt="Quiz me on the topic for my next upcoming quiz or exam."><i data-icon="help"></i><b>Quiz me</b><span>Practice for what's next</span></button>
+            <button class="suggestion" data-prompt="Make me flashcards from the most recent module in one of my courses."><i data-icon="layers"></i><b>Flashcards</b><span>From your course notes</span></button>
+            <button class="suggestion" data-prompt="Make me a realistic study plan for the next 7 days based on my deadlines."><i data-icon="chart"></i><b>Plan my week</b><span>Around your real deadlines</span></button>
+            <button class="suggestion" data-prompt="Any new announcements from my classes?"><i data-icon="megaphone"></i><b>Announcements</b><span>What did profs post?</span></button>
+          </div>
+        </section>
       </div>
 
-      <form class="composer" id="composer">
-        <button type="button" class="mic" id="micBtn" title="Talk to Cuss">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
-        </button>
-        <textarea id="input" rows="1" placeholder="Ask Cuss anything…"></textarea>
-        <button type="submit" class="send" id="sendBtn" title="Send">➤</button>
-      </form>
-      <div class="voice-hint hidden" id="voiceHint"></div>
+      <div class="composer-wrap">
+        <form class="composer" id="composer">
+          <button type="button" class="comp-btn" id="micBtn" title="Dictate (⌘M)"><i data-icon="mic"></i></button>
+          <textarea id="input" rows="1" placeholder="Ask Cuss anything…"></textarea>
+          <button type="button" class="comp-btn voice-mode-btn" id="voiceModeBtn" title="Voice conversation"><i data-icon="wave"></i></button>
+          <button type="submit" class="send" id="sendBtn" title="Send"><i data-icon="up"></i></button>
+        </form>
+        <div class="composer-hint" id="voiceHint">Cuss reads your Canvas so you don't have to. <kbd>Enter</kbd> to send · <kbd>⌘M</kbd> to talk</div>
+      </div>
     </main>
+
+    <!-- Right: today -->
+    <aside class="today" id="today">
+      <div class="today-head">
+        <div>
+          <div class="today-title">Today</div>
+          <div class="today-date" id="todayDate"></div>
+        </div>
+        <button class="icon-btn ghost" id="refreshBtn" title="Refresh"><i data-icon="refresh"></i></button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-num" id="statDue">–</div><div class="stat-label">due this week</div></div>
+        <div class="stat warn"><div class="stat-num" id="statMissing">–</div><div class="stat-label">missing</div></div>
+        <div class="stat good"><div class="stat-num" id="statGrade">–</div><div class="stat-label">avg grade</div></div>
+      </div>
+      <div class="panel-label">Coming up</div>
+      <div id="missingList"></div>
+      <ul class="deadlines" id="deadlineList">
+        <li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li>
+      </ul>
+      <a class="cal-link" href="/calendar.ics"><i data-icon="calendar"></i>Add all deadlines to my calendar</a>
+      <div class="panel-label">Courses</div>
+      <ul class="courses" id="courseList"><li class="skeleton short"></li><li class="skeleton short"></li></ul>
+      <div class="notify-box hidden" id="notifyBox">
+        <b>Never miss a deadline</b>
+        <p>Turn on notifications and I'll remind you before things are due.</p>
+        <button class="btn small" id="enableNotify">Enable reminders</button>
+      </div>
+    </aside>
   </div>
 
-  <!-- Settings / first-run setup -->
+  <!-- Full-screen voice conversation -->
+  <div class="voice-overlay hidden" id="voiceOverlay" aria-live="polite">
+    <button class="icon-btn ghost voice-close" id="voiceClose" title="End voice mode"><i data-icon="x"></i></button>
+    <div class="orb big-orb" id="voiceOrb"><span></span></div>
+    <div class="voice-state" id="voiceState">Listening…</div>
+    <div class="voice-caption" id="voiceCaption">Ask about deadlines, studying, or your professors.</div>
+    <div class="voice-actions">
+      <button class="btn ghost" id="voiceTap">Tap to talk</button>
+      <button class="btn danger-solid" id="voiceEnd">End</button>
+    </div>
+  </div>
+
+  <!-- Settings -->
   <dialog id="settings">
     <form method="dialog" id="settingsForm">
-      <h2>Settings</h2>
-      <div class="account-row">
-        <span class="muted" id="accountLine">Logged in with Canvas</span>
-        <button type="button" class="btn ghost small" id="logoutBtn">Log out</button>
+      <div class="dialog-head">
+        <h2>Settings</h2>
+        <button type="button" class="icon-btn ghost" id="settingsCancel" title="Close"><i data-icon="x"></i></button>
       </div>
 
-      <label>Remind me before due dates (hours, comma-separated)
+      <div class="account-row">
+        <div class="avatar" id="avatar2">?</div>
+        <span class="muted" id="accountLine">Logged in with Canvas</span>
+        <button type="button" class="btn ghost small" id="logoutBtn"><i data-icon="logout"></i>Log out</button>
+      </div>
+
+      <h3 class="settings-sub">Reminders</h3>
+      <label>Remind me before due dates (hours)
         <input name="reminderHours" placeholder="72, 24, 3" />
       </label>
 
       <h3 class="settings-sub">Independent mode</h3>
       <label class="switch-row">
         <input type="checkbox" name="independent" />
-        <span><b>Let Cuss work on its own</b><br /><small class="muted">Every morning Cuss checks Canvas by itself, writes your daily briefing and study plan, makes study sets before tests, and alerts you about new announcements. (The app has to be running.)</small></span>
+        <span><b>Let Cuss work on its own</b><small>Every morning Cuss checks Canvas by itself, writes your daily briefing and study plan, makes study sets before tests, and alerts you about new announcements.</small></span>
       </label>
-      <label>Daily briefing time
-        <input name="briefingTime" type="time" value="07:30" />
-      </label>
-      <button type="button" class="btn ghost small" id="briefNowBtn">Run a briefing now</button>
+      <div class="inline-row">
+        <label>Daily briefing time <input name="briefingTime" type="time" value="07:30" /></label>
+        <button type="button" class="btn ghost small" id="briefNowBtn"><i data-icon="sun"></i>Run a briefing now</button>
+      </div>
 
       <label class="switch-row">
         <input type="checkbox" name="autoSendEmails" />
-        <span><b>Send emails without asking me</b><br /><small class="muted">Off = Cuss shows you every email and waits for you to press Send. On = Cuss sends messages to your instructors right away when you ask it to email someone. Emails can't be unsent.</small></span>
+        <span><b>Send emails without asking me</b><small>Off: you review every email and press Send. On: Cuss sends right away when you ask it to email someone. Emails can't be unsent.</small></span>
       </label>
 
       <h3 class="settings-sub">What Cuss remembers about you</h3>
@@ -113,23 +159,24 @@
       </div>
 
       <h3 class="settings-sub">Voice</h3>
-      <label class="inline"><span>Speaking voice</span>
-        <select id="voiceSelect"></select>
-      </label>
+      <label>Speaking voice <select id="voiceSelect"></select></label>
 
       <h3 class="settings-sub">Your data</h3>
-      <p class="muted small">Cuss stores your chats, notes and settings so it can remember you. This deletes all of it and disconnects Cuss from your Canvas account.</p>
-      <button type="button" class="btn danger small" id="deleteAccountBtn">Delete my data &amp; disconnect</button>
+      <p class="muted small">Cuss stores your chats, notes and settings so it can remember you.</p>
+      <div class="inline-row">
+        <button type="button" class="btn ghost small hidden" id="resetDemoBtn"><i data-icon="refresh"></i>Start the demo over</button>
+        <button type="button" class="btn danger small" id="deleteAccountBtn"><i data-icon="trash"></i>Delete my data &amp; disconnect</button>
+      </div>
 
       <p class="form-error hidden" id="settingsError"></p>
       <div class="dialog-actions">
-        <button type="button" class="btn ghost" id="settingsCancel">Cancel</button>
         <button type="submit" class="btn" id="settingsSave">Save</button>
       </div>
     </form>
   </dialog>
 
   <div class="toasts" id="toasts"></div>
+  <script src="icons.js"></script>
   <script src="app.js" type="module"></script>
 </body>
 </html>

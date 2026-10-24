@@ -81,4 +81,6 @@ Things to try:
 - `lib/agent.js`: the AI assistant (Claude) and its tools.
 - `lib/chats.js`: saved chats, email drafts, long-term memory.
 - `lib/reminders.js`: background reminders, announcements, independent-mode briefings, calendar feed.
-- `public/`: the web app (`login.html`, chat, dashboard, voice).
+- `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes).
+
+Presenting Cuss? See **`DEMO-SCRIPT.md`** for a 3-minute walkthrough and a pre-demo checklist.
