@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Impact · Cuss</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { overflow: auto; }
+    .doc { max-width: 980px; margin: 0 auto; padding: 48px 20px 80px; }
+    .doc h1 { font-size: clamp(34px, 5vw, 52px); letter-spacing: -.03em; margin: 16px 0 6px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 18px 0 8px; }
+    .big { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+    .big b { display: block; font-size: 36px; letter-spacing: -.02em; }
+    .big span { color: var(--muted); font-size: 14px; }
+    .doc h2 { font-size: 20px; margin: 34px 0 6px; }
+    .doc li { margin: 6px 0; line-height: 1.6; }
+    .tag { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main class="doc">
+    <img src="/icons/logo-512.png" alt="Cuss" style="width:72px;height:72px;display:block" />
+    <h1>How Cuss measures <span class="grad-text">impact</span></h1>
+    <p class="muted">Live, anonymous totals: no names, no course content. Updated <span id="updated">…</span>.</p>
+
+    <div class="tag" style="margin-top:26px">Real student accounts</div>
+    <div class="grid" id="real"></div>
+    <div class="tag" style="margin-top:20px">Demo sessions (Demo University)</div>
+    <div class="grid" id="demo"></div>
+
+    <h2>What we measure, and why</h2>
+    <ul>
+      <li><b>Missing assignments over time</b>: each student's count of missing work, recorded daily from Canvas. Goal: it goes down after a student starts using Cuss.</li>
+      <li><b>Reminders delivered before a deadline</b>, and whether the work then gets submitted on time.</li>
+      <li><b>Emails and replies to professors</b> that students actually sent, a proxy for asking for help instead of staying stuck.</li>
+      <li><b>Practice quizzes and scores</b> from real course material, a proxy for studying earlier and with feedback.</li>
+    </ul>
+
+    <h2>Pilot plan at SF State</h2>
+    <ul>
+      <li>Start with 20–30 students from one community (for example first-gen or working, commuting students), with a short survey before and after 4 weeks: stress about deadlines, and confidence emailing professors.</li>
+      <li>Compare each student's missing-assignment count and on-time submission rate in the 4 weeks before and after joining.</li>
+      <li>Share results with students and the university. Students can delete their data at any time.</li>
+    </ul>
+    <p class="muted" style="margin-top:32px"><a href="/">← Back to Cuss</a> · <a href="/privacy.html">Privacy</a></p>
+  </main>
+  <script>
+    const card = (n, label) => `<div class="big"><b>${n}</b><span>${label}</span></div>`;
+    const fill = (id, g) => {
+      const c = g.counts || {};
+      document.getElementById(id).innerHTML = [
+        card(g.students, "students"),
+        card(c.reminder || 0, "deadline reminders sent"),
+        card((c.email_sent || 0) + (c.reply_sent || 0), "emails & replies sent"),
+        card(g.quizzesTaken, g.quizAverage != null ? `practice quizzes (avg ${g.quizAverage}%)` : "practice quizzes"),
+        card(c.inbox_alert || 0, "professor replies flagged"),
+        card(g.studentsWithTrend ? `${g.missingStart} → ${g.missingNow}` : "–", "missing assignments (start → now)"),
+      ].join("");
+    };
+    fetch("/impact.json").then((r) => r.json()).then((d) => {
+      fill("real", d.real);
+      fill("demo", d.demo);
+      document.getElementById("updated").textContent = new Date(d.updatedAt).toLocaleString();
+    });
+  </script>
+</body>
+</html>

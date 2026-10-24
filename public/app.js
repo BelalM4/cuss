@@ -204,6 +204,7 @@ async function loadDashboard() {
     $("#deadlineList").replaceChildren(el("li", { class: "empty-note" }, err.message));
   }
   loadInbox();
+  loadImpact();
   try {
     const courses = await api("/api/courses");
     const scored = courses.filter((c) => c.currentScore != null);
@@ -220,6 +221,20 @@ async function loadDashboard() {
         );
       }),
     );
+  } catch {}
+}
+
+async function loadImpact() {
+  try {
+    const imp = await api("/api/impact");
+    const c = imp.counts || {};
+    const items = [
+      [c.reminder || 0, "reminders"],
+      [(c.email_sent || 0) + (c.reply_sent || 0), "emails sent"],
+      [imp.quizzesTaken || 0, imp.quizAverage != null ? `quizzes · ${imp.quizAverage}% avg` : "quizzes"],
+    ];
+    if (imp.missing && imp.missing.firstDay !== imp.missing.lastDay) items.push([`${imp.missing.first}→${imp.missing.last}`, "missing work"]);
+    $("#impactRow").replaceChildren(...items.map(([n, label]) => el("span", { class: "impact-chip" }, el("b", {}, String(n)), ` ${label}`)));
   } catch {}
 }
 
@@ -599,6 +614,7 @@ function quizCard({ title, questions }) {
     body.replaceChildren();
     if (i >= questions.length) {
       const perfect = score === questions.length;
+      api("/api/impact/quiz", { method: "POST", body: { score, total: questions.length } }).then(loadImpact).catch(() => {});
       body.append(
         el(
           "div",

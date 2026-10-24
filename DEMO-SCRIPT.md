@@ -41,13 +41,17 @@ Answer one question.
 **1:35 – Voice (15 s)**
 Tap **Talk** (or the sound-wave button) and ask: **"What should I work on tonight?"**
 
-**1:50 – Close (10 s)**
+**1:50 – Impact + close (10 s)**
+> "We measure impact inside the app: missing assignments over time, reminders delivered, emails actually sent, and quiz scores. It's all on our live impact page."
 > "Students sign in with their real school login. It's ready for SF State as soon as the school approves it, and it works at any Canvas school. Scan this to try it yourself."
 Hand over the QR code.
 
 ---
 
-## For the Anthropic track: know where Claude can go wrong
+## For the Anthropic "Claude for Public Benefit" track
+Judges look for: (1) a **named community**: say it exactly, e.g. "first-gen SF State students"; (2) a **real problem you've lived**: tell your story; (3) a **working product and how you measure impact**: show `/impact`; (4) **thoughtful use of Claude**: the live steps, plus the fact that it was built with Claude Code.
+
+### Know where Claude can go wrong
 Judges will ask. Have these answers ready:
 - **Wrong or made-up deadlines:** Cuss never answers from memory. It calls Canvas tools every time and shows each step, so students can see where an answer came from. Dates come straight from the Canvas planner.
 - **Sending the wrong email to a professor:** every email and reply is a draft the student must approve. Auto-send is an opt-in with a warning.

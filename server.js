@@ -9,6 +9,7 @@ import { chat, describeError } from "./lib/agent.js";
 import * as chats from "./lib/chats.js";
 import * as auth from "./lib/auth.js";
 import { demoCanvasRouter } from "./lib/demo-canvas.js";
+import { recordImpact, myImpact, aggregateImpact } from "./lib/impact.js";
 import {
   getConfig,
   saveConfig,
@@ -68,6 +69,10 @@ app.get("/qr.svg", async (req, res) => {
 });
 app.get("/share", (req, res) => res.sendFile(path.join(here, "public", "share.html")));
 app.get("/share-info", (req, res) => res.json({ url: serverConfig().publicUrl }));
+
+// Anonymous totals for judges and partners: no names, no course data.
+app.get("/impact.json", (req, res) => res.json(aggregateImpact()));
+app.get("/impact", (req, res) => res.sendFile(path.join(here, "public", "impact.html")));
 
 // What the login page needs to know (no secrets).
 app.get("/auth/info", (req, res) => {
@@ -223,6 +228,16 @@ app.get(
   }),
 );
 
+// Impact: the student's own numbers, and quiz results reported by the page.
+app.get("/api/impact", (req, res) => res.json(myImpact()));
+app.post("/api/impact/quiz", (req, res) => {
+  const score = Number(req.body?.score);
+  const total = Number(req.body?.total);
+  if (!(total > 0 && score >= 0 && score <= total && total <= 100)) return res.status(400).json({ error: "Bad quiz result." });
+  recordImpact("quiz", { score, total });
+  res.json({ ok: true });
+});
+
 // Unread Canvas Inbox messages for the Today panel.
 app.get(
   "/api/inbox",
@@ -297,6 +312,7 @@ app.post("/api/chat", async (req, res) => {
   }
   state.usageCount++;
   saveState(state);
+  recordImpact("chat");
   res.setHeader("Content-Type", "application/x-ndjson");
   res.setHeader("Cache-Control", "no-cache");
   const emit = (event) => res.write(JSON.stringify(event) + "\n");
@@ -334,6 +350,7 @@ app.post(
     Object.assign(draft, { status: "sent", subject, body });
     chats.saveDraft(draft);
     chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
+    recordImpact(draft.kind === "reply" ? "reply_sent" : "email_sent");
     res.json({ ok: true });
   }),
 );
