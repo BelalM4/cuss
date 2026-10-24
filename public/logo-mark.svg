@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B5BF6"/>
+      <stop offset=".55" stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <radialGradient id="shine" cx=".28" cy=".18" r=".9">
+      <stop offset="0" stop-color="#fff" stop-opacity=".38"/>
+      <stop offset=".55" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#3b0764" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#g)"/>
+  <rect width="1024" height="1024" fill="url(#shine)"/>
+  <g filter="url(#soft)" fill="none" stroke="#fff" stroke-linecap="round">
+    <!-- The "C": an open ring, like a conversation bubble -->
+    <path d="M676.3 347.7 A232 232 0 1 0 676.3 676.3" stroke-width="124"/>
+  </g>
+  <!-- The spark: AI at work -->
+  <path filter="url(#soft)" fill="#fff" d="M742 392 C754 470 766 482 846 494 C766 506 754 518 742 596 C730 518 718 506 638 494 C718 482 730 470 742 392 Z" transform="translate(-10 18)"/>
+</svg>

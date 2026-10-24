@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Cuss · Your Canvas study assistant</title>
   <meta name="theme-color" content="#0b0b14" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236366f1'/><stop offset='.55' stop-color='%23a855f7'/><stop offset='1' stop-color='%23ec4899'/></linearGradient></defs><rect width='100' height='100' rx='28' fill='url(%23g)'/><text x='50' y='69' font-size='56' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='800'>C</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/icons/favicon-64.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Cuss" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -16,7 +23,7 @@
     <!-- Left: chats -->
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="logo">C</div>
+        <img class="logo-img" src="/logo.svg" alt="Cuss" />
         <div class="brand-text">
           <div class="brand-name">Cuss</div>
           <div class="brand-sub" id="schoolLine">for Canvas</div>
@@ -106,6 +113,15 @@
       </div>
     </aside>
   </div>
+
+  <!-- iOS-style tab bar (phones) -->
+  <nav class="tabbar" id="tabbar" aria-label="Sections">
+    <button data-tab="chat" class="active"><i data-icon="message" data-size="22"></i><span>Chat</span></button>
+    <button data-tab="history"><i data-icon="history" data-size="22"></i><span>History</span></button>
+    <button data-tab="voice" class="tab-talk"><span class="talk-orb"><i data-icon="wave" data-size="22"></i></span><span>Talk</span></button>
+    <button data-tab="today"><i data-icon="calendar" data-size="22"></i><span>Today</span><span class="badge hidden" id="tabBadge"></span></button>
+    <button data-tab="settings"><i data-icon="settings" data-size="22"></i><span>Settings</span></button>
+  </nav>
 
   <!-- Full-screen voice conversation -->
   <div class="voice-overlay hidden" id="voiceOverlay" aria-live="polite">
