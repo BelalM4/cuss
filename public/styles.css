@@ -248,6 +248,11 @@ kbd { font: 11.5px Inter, sans-serif; border: 1px solid var(--line); border-bott
 .mail-body textarea { min-height: 200px; resize: vertical; line-height: 1.6; background: var(--panel-2); }
 .sent-note { display: inline-flex; align-items: center; gap: 7px; color: var(--ok); font-weight: 600; }
 
+.quote { margin-top: 12px; border-left: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 12px 12px 0; padding: 10px 12px; font-size: 13.5px; }
+.quote-head { color: var(--muted); font-size: 12.5px; margin-bottom: 4px; }
+.quote-head b { color: var(--text); }
+.quote-body { white-space: pre-wrap; color: var(--muted); max-height: 140px; overflow-y: auto; }
+
 /* Flashcards */
 .fc-wrap { perspective: 1200px; }
 .flashcard { height: 220px; cursor: pointer; user-select: none; }
@@ -342,6 +347,20 @@ kbd { font: 11.5px Inter, sans-serif; border: 1px solid var(--line); border-bott
 .course-top .g { font-weight: 700; }
 .gbar { height: 6px; border-radius: 3px; background: var(--line); margin-top: 6px; overflow: hidden; }
 .gbar > div { height: 100%; background: var(--grad); border-radius: 3px; transition: width 1s var(--ease); }
+.count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--grad); color: #fff; font-size: 10.5px; letter-spacing: 0; margin-left: 4px; vertical-align: 1px; }
+.inbox { list-style: none; margin: 0; padding: 0; }
+.inbox-item {
+  display: flex; gap: 10px; padding: 10px 12px; border-radius: 14px; margin-bottom: 7px; cursor: pointer; background: var(--panel);
+  border: 1px solid var(--line); transition: transform .15s var(--ease), border-color .2s; animation: fadeUp .4s var(--ease) both;
+}
+.inbox-item:hover { transform: translateX(2px); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+.inbox-item .avatar.mini, .recipient .avatar.mini { width: 28px; height: 28px; font-size: 11px; }
+.recipient .avatar.mini { width: 20px; height: 20px; font-size: 10px; }
+.inbox-item .info { flex: 1; min-width: 0; }
+.inbox-item .from { font-weight: 600; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
+.dot-unread { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-3); }
+.inbox-item .subj { font-size: 13px; }
+.inbox-item .snip { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
 .notify-box { margin-top: 20px; background: var(--grad); color: #fff; padding: 14px; border-radius: 16px; font-size: 13.5px; }
 .notify-box p { margin: 4px 0 10px; opacity: .9; }

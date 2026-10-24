@@ -44,6 +44,14 @@
 > specific email. I can edit it, and nothing sends until I press Send. It goes through Canvas Inbox."
 - Press **Send via Canvas**. (In the demo it goes nowhere.)
 
+## 5b. Your inbox, handled (30 seconds)
+- In the Today panel under **Messages**, click **Prof. Daniel Ortiz – Gilded Age reading quiz**.
+> "Cuss reads my Canvas inbox too. My history professor offered to reopen a quiz I missed. Cuss summarized it
+> and already drafted a reply saying yes."
+- Press **Send reply**. About 15 seconds later a pop-up appears: **New message from Prof. Daniel Ortiz**.
+> "And here's the professor writing back. Cuss alerts me the moment a professor replies, so nothing gets buried."
+- Tip: send the Dr. Chen email from step 5 first. Her reply arrives while you show the quiz, which feels like magic.
+
 ## 6. The wow moment: voice mode (35 seconds)
 - Click the **sound-wave button** in the message bar.
 - Say: **"What should I work on tonight?"**
@@ -61,6 +69,7 @@
 
 ## Likely judge questions
 - **How does it connect to Canvas?** Through Canvas's official sign-in (OAuth2), the same way approved apps connect. Each school's Canvas admins approve the app once, and then students just log in.
+- **Can it really send and read messages?** Yes, through Canvas Inbox (Canvas also emails the professor). In the demo, the professors are simulated and messages stay inside the demo. With a real school account, they go to real people, and only after the student presses Send.
 - **Is student data safe?** Each student only sees their own data, nothing is shared between students, and students can delete their data and disconnect anytime. Emails never send without the student's approval unless they turn on auto-send.
 - **What about cheating?** Cuss is built to help students learn. It won't do graded work or answer live quizzes; it explains concepts, quizzes you on your notes, and helps you plan.
 - **What's the tech?** Node.js + Express, the Canvas REST API, and Claude (Anthropic) with tool use, so it decides which Canvas data to look up and shows each step live. Voice uses the browser's built-in speech recognition and text-to-speech.

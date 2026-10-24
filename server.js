@@ -19,7 +19,7 @@ import {
   getState,
   saveState,
 } from "./lib/store.js";
-import { startReminderLoop, notificationsSince, checkReminders, deadlinesIcs, runBriefing } from "./lib/reminders.js";
+import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -99,7 +99,7 @@ app.get("/auth/callback", async (req, res) => {
   try {
     const userId = await auth.finishLogin(String(code), { demo: String(state).endsWith(".demo") });
     auth.startSession(res, userId);
-    runAsUser(userId, () => checkReminders().catch(() => {}));
+    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.redirect("/");
   } catch (err) {
     console.error(err);
@@ -124,7 +124,7 @@ app.post(
       saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "" }),
     );
     auth.startSession(res, userId);
-    runAsUser(userId, () => checkReminders().catch(() => {}));
+    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.json({ ok: true });
   }),
 );
@@ -196,6 +196,12 @@ app.get(
     ]);
     res.json({ upcoming, missing });
   }),
+);
+
+// Unread Canvas Inbox messages for the Today panel.
+app.get(
+  "/api/inbox",
+  wrap(async (req, res) => res.json(await canvas.listConversations({ scope: "unread", limit: 5 }))),
 );
 
 app.get(
@@ -278,13 +284,17 @@ app.post(
     if (draft.status === "sent") return res.json({ ok: true, alreadySent: true });
     const subject = String(req.body?.subject ?? draft.subject).trim();
     const body = String(req.body?.body ?? draft.body).trim();
-    if (!subject || !body) return res.status(400).json({ error: "Subject and message can't be empty." });
-    await canvas.sendMessage({
-      courseId: draft.courseId,
-      recipientIds: draft.recipients.map((r) => r.id),
-      subject,
-      body,
-    });
+    if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
+    if (draft.kind === "reply") {
+      await canvas.replyToConversation(draft.conversationId, body);
+    } else {
+      await canvas.sendMessage({
+        courseId: draft.courseId,
+        recipientIds: draft.recipients.map((r) => r.id),
+        subject,
+        body,
+      });
+    }
     Object.assign(draft, { status: "sent", subject, body });
     chats.saveDraft(draft);
     chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });

@@ -3,6 +3,7 @@
 A personal AI assistant for school. Students click **"Log in with SFSU Canvas"**, sign in on the usual school login page, and Cuss:
 
 - **Reminds them about due dates.** It alerts them 3 days, 1 day and 3 hours before anything unsubmitted is due (adjustable) and when there's a new announcement. A one-click calendar export covers Google, Apple and Outlook.
+- **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. You also get an alert when a professor writes back.
 - **Writes emails to professors.** It finds the right instructor or TA, writes a polite message, and sends it through Canvas Inbox when the student presses **Send** (or says *"send it"*).
 - **Helps them study.** It reads their actual course pages, files (PDFs too), assignments and syllabus, explains topics, and makes **flashcards** and **practice quizzes**.
 - **Remembers them.** Saved chats appear in the sidebar, and long-term notes about the student (major, study style…) carry across chats.

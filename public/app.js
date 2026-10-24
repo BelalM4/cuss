@@ -201,6 +201,7 @@ async function loadDashboard() {
   } catch (err) {
     $("#deadlineList").replaceChildren(el("li", { class: "empty-note" }, err.message));
   }
+  loadInbox();
   try {
     const courses = await api("/api/courses");
     const scored = courses.filter((c) => c.currentScore != null);
@@ -218,6 +219,38 @@ async function loadDashboard() {
       }),
     );
   } catch {}
+}
+
+async function loadInbox() {
+  const ul = $("#inboxList");
+  try {
+    const unread = await api("/api/inbox");
+    $("#inboxCount").textContent = unread.length;
+    $("#inboxCount").classList.toggle("hidden", !unread.length);
+    ul.replaceChildren();
+    if (!unread.length) ul.append(el("li", { class: "empty-note" }, "No unread messages."));
+    unread.forEach((c, i) => {
+      const from = c.participants.find((p) => p !== state.status?.studentName) || c.participants[0] || "Canvas";
+      ul.append(
+        el(
+          "li",
+          {
+            class: "inbox-item",
+            style: `animation-delay:${i * 40}ms`,
+            title: "Open with Cuss",
+            onclick: () => {
+              closePanels();
+              send(`Open my Canvas message "${c.subject}" from ${from} and tell me what I need to do.`);
+            },
+          },
+          el("span", { class: "avatar mini" }, initials(from)),
+          el("div", { class: "info" }, el("div", { class: "from" }, from, el("span", { class: "dot-unread" })), el("div", { class: "subj" }, c.subject), el("div", { class: "snip" }, c.lastMessage)),
+        ),
+      );
+    });
+  } catch {
+    ul.replaceChildren(el("li", { class: "empty-note" }, "Couldn't load messages."));
+  }
 }
 
 // ---------------------------------------------------------------- chat history
@@ -387,7 +420,7 @@ function renderStepGroup(steps = []) {
 function addCard(card) {
   welcomeNode.classList.add("hidden");
   const node =
-    card.kind === "draft" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : null;
+    card.kind === "draft" || card.kind === "reply" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : null;
   if (node) $("#messages").append(node);
   scrollDown();
 }
@@ -397,14 +430,23 @@ function cardHead(iconName, title, ...extra) {
 }
 
 function draftCard(draft) {
-  const subject = el("input", { value: draft.subject, "aria-label": "Subject" });
+  const isReply = draft.kind === "reply";
+  const subject = el("input", { value: isReply ? `Re: ${draft.subject}` : draft.subject, "aria-label": "Subject", disabled: isReply });
   const body = el("textarea", { "aria-label": "Message" }, draft.body);
   const actions = el("div", { class: "card-actions" });
   const status = el("span", { class: "chip" }, "Draft");
+  const quote = isReply && draft.quote
+    ? el(
+        "div",
+        { class: "quote" },
+        el("div", { class: "quote-head" }, el("b", {}, draft.quote.from), " wrote", draft.quote.at ? ` · ${new Date(draft.quote.at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : ""),
+        el("div", { class: "quote-body" }, draft.quote.body),
+      )
+    : null;
   const card = el(
     "div",
     { class: "card" },
-    cardHead("mail", "Email to your instructor", status),
+    cardHead(isReply ? "message" : "mail", isReply ? "Reply in Canvas Inbox" : "Email to your instructor", status),
     el(
       "div",
       { class: "card-body" },
@@ -415,6 +457,7 @@ function draftCard(draft) {
         el("div", {}, draft.recipients.map((r) => el("span", { class: "recipient" }, el("span", { class: "avatar mini" }, initials(r.name)), r.name))),
       ),
       el("div", { class: "mail-row" }, el("span", { class: "k" }, "Subject"), subject),
+      quote,
       el("div", { class: "mail-body" }, body),
     ),
     actions,
@@ -424,7 +467,7 @@ function draftCard(draft) {
     subject.disabled = body.disabled = true;
     status.textContent = "Sent";
     status.className = "chip ok";
-    actions.replaceChildren(el("span", { class: "sent-note", html: `${icon("check", 16)} Sent through Canvas Inbox` }));
+    actions.replaceChildren(el("span", { class: "sent-note", html: `${icon("check", 16)} ${isReply ? "Reply sent" : "Sent"} through Canvas Inbox` }));
     if (state.openDraft?.id === draft.id) state.openDraft = null;
   };
   if (draft.status === "sent") {
@@ -432,18 +475,20 @@ function draftCard(draft) {
     return card;
   }
 
-  const sendBtn = el("button", { class: "btn", html: `${icon("send", 16)} Send via Canvas` });
+  const sendLabel = `${icon("send", 16)} ${isReply ? "Send reply" : "Send via Canvas"}`;
+  const sendBtn = el("button", { class: "btn", html: sendLabel });
   const send = async () => {
     sendBtn.disabled = true;
     sendBtn.textContent = "Sending…";
     try {
-      await api(`/api/drafts/${draft.id}/send`, { method: "POST", body: { subject: subject.value, body: body.value } });
+      await api(`/api/drafts/${draft.id}/send`, { method: "POST", body: { subject: isReply ? draft.subject : subject.value, body: body.value } });
       markSent();
+      setTimeout(loadInbox, 1500);
       toast("Message sent", `Your message went to ${draft.recipients.map((r) => r.name).join(", ")}.`, { iconName: "send" });
       if (state.speakReplies || state.voiceMode) speak("Sent. Your message is on its way.");
     } catch (err) {
       sendBtn.disabled = false;
-      sendBtn.innerHTML = `${icon("send", 16)} Send via Canvas`;
+      sendBtn.innerHTML = sendLabel;
       toast("Couldn't send", err.message, { iconName: "alert" });
     }
   };
@@ -865,8 +910,15 @@ async function pollNotifications() {
   try {
     const items = await api(`/api/notifications?since=${encodeURIComponent(state.lastNotification)}`);
     for (const n of items) {
-      const open = n.chatId ? () => openChat(n.chatId) : n.url ? () => window.open(n.url, "_blank") : undefined;
-      toast(n.title, n.body, { iconName: n.chatId ? "sun" : /announcement/i.test(n.title) ? "megaphone" : "clock", onclick: open });
+      const open = n.chatId
+        ? () => openChat(n.chatId)
+        : n.conversationId
+          ? () => send(`Open my Canvas message "${n.body}" and tell me what it says.`)
+          : n.url
+            ? () => window.open(n.url, "_blank")
+            : undefined;
+      toast(n.title, n.body, { iconName: n.chatId ? "sun" : n.conversationId ? "message" : /announcement/i.test(n.title) ? "megaphone" : "clock", onclick: open });
+      if (n.conversationId) loadInbox();
       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
         const note = new Notification(n.title, { body: n.body, tag: n.id });
         note.onclick = () => {

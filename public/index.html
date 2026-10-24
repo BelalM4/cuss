@@ -59,7 +59,7 @@
             <button class="suggestion" data-prompt="Quiz me on the topic for my next upcoming quiz or exam."><i data-icon="help"></i><b>Quiz me</b><span>Practice for what's next</span></button>
             <button class="suggestion" data-prompt="Make me flashcards from the most recent module in one of my courses."><i data-icon="layers"></i><b>Flashcards</b><span>From your course notes</span></button>
             <button class="suggestion" data-prompt="Make me a realistic study plan for the next 7 days based on my deadlines."><i data-icon="chart"></i><b>Plan my week</b><span>Around your real deadlines</span></button>
-            <button class="suggestion" data-prompt="Any new announcements from my classes?"><i data-icon="megaphone"></i><b>Announcements</b><span>What did profs post?</span></button>
+            <button class="suggestion" data-prompt="Check my Canvas inbox. Any messages from my professors I need to deal with?"><i data-icon="message"></i><b>Check my messages</b><span>Replies from professors</span></button>
           </div>
         </section>
       </div>
@@ -89,6 +89,8 @@
         <div class="stat warn"><div class="stat-num" id="statMissing">–</div><div class="stat-label">missing</div></div>
         <div class="stat good"><div class="stat-num" id="statGrade">–</div><div class="stat-label">avg grade</div></div>
       </div>
+      <div class="panel-label">Messages <span class="count hidden" id="inboxCount"></span></div>
+      <ul class="inbox" id="inboxList"><li class="skeleton short"></li></ul>
       <div class="panel-label">Coming up</div>
       <div id="missingList"></div>
       <ul class="deadlines" id="deadlineList">
