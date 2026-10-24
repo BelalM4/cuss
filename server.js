@@ -1,6 +1,7 @@
 import "./lib/env.js";
 import express from "express";
 import crypto from "node:crypto";
+import QRCode from "qrcode";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as canvas from "./lib/canvas.js";
@@ -18,6 +19,8 @@ import {
   deleteUserData,
   getState,
   saveState,
+  readAppJson,
+  writeAppJson,
 } from "./lib/store.js";
 import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
 
@@ -57,6 +60,14 @@ const wrap = (fn) => async (req, res) => {
 };
 
 // --- Login ---------------------------------------------------------------------
+
+// QR code pointing at this app, for "scan to try it" on a slide or poster.
+app.get("/qr.svg", async (req, res) => {
+  const svg = await QRCode.toString(serverConfig().publicUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+  res.type("image/svg+xml").set("Cache-Control", "no-cache").send(svg);
+});
+app.get("/share", (req, res) => res.sendFile(path.join(here, "public", "share.html")));
+app.get("/share-info", (req, res) => res.json({ url: serverConfig().publicUrl }));
 
 // What the login page needs to know (no secrets).
 app.get("/auth/info", (req, res) => {
@@ -259,6 +270,17 @@ app.post("/api/chat", async (req, res) => {
   if (state.usageCount >= limit) {
     return res.status(429).json({ error: `You've reached today's limit of ${limit} messages. It resets tomorrow.` });
   }
+  // ...and an overall cap, since demo visitors each count as a new student.
+  const totalLimit = Number(process.env.DAILY_TOTAL_LIMIT) || 0;
+  if (totalLimit) {
+    const usage = readAppJson("usage.json", {});
+    if (usage.day !== today) Object.assign(usage, { day: today, count: 0 });
+    if (usage.count >= totalLimit) {
+      return res.status(429).json({ error: "Cuss has hit today's demo limit. Thanks for trying it! It resets tomorrow." });
+    }
+    usage.count++;
+    writeAppJson("usage.json", usage);
+  }
   state.usageCount++;
   saveState(state);
   res.setHeader("Content-Type", "application/x-ndjson");
@@ -309,7 +331,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 app.listen(PORT, HOST, () => {
   const s = serverConfig();
   console.log(`\n  Cuss for Canvas is running → ${s.publicUrl}`);
-  if (!s.canvasUrl) console.log("  ⚠  Set CANVAS_URL in .env (e.g. https://sfsu.instructure.com)");
+  if (!s.canvasUrl) console.log(s.demo ? "  ⓘ No CANVAS_URL set: running with the demo school only" : "  ⚠  Set CANVAS_URL in .env (e.g. https://sfsu.instructure.com)");
   if (!s.anthropicKey) console.log("  ⚠  Set ANTHROPIC_API_KEY in .env");
   console.log(ssoEnabled() ? "  ✓ Canvas SSO login is on" : "  ⓘ Canvas SSO login is off until CANVAS_CLIENT_ID / CANVAS_CLIENT_SECRET are set");
   console.log("");

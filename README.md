@@ -36,6 +36,15 @@ Canvas only lets an app use the school's login page once the school's Canvas adm
 
 Until then, the login page shows **"Use a Canvas access token instead"**. That works at schools that allow personal tokens, or with a token an SFSU admin generates for you.
 
+### Quick public demo (for hackathons and judges)
+This repo includes a `render.yaml`, so you can host the demo free on [Render](https://render.com):
+1. Sign up at render.com with your GitHub account.
+2. Click **New + → Blueprint**, pick this repo, and click **Apply**.
+3. When asked, paste your `ANTHROPIC_API_KEY`. Everything else is preset: demo mode, a fast AI setting, and daily message caps (40 per visitor, 400 total) to protect your bill.
+4. Your link appears at the top (like `https://cuss.onrender.com`). Open **`/share`** on it for a big QR code to show on screen.
+
+The free plan sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute. Open the link a few minutes before judging (or upgrade to the $7 plan for the day).
+
 ### 3. Share it with other students (hosting)
 Running it on your laptop lets you use it yourself. For other students, it needs to run on a server with a public `https://` address, for example Render, Railway or Fly.io:
 - Set the same values as your `.env` in the host's "environment variables" settings, plus `HOST=0.0.0.0` and `PUBLIC_URL=https://your-app-address`.
