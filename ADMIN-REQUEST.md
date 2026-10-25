@@ -10,7 +10,7 @@ Fill in the parts in [brackets].
 
 Hello,
 
-I'm Belal Elboheisy, a [your major] student at SFSU. I built **Cuss for Canvas** at
+I'm Belal Elboheisy, an economics student at SFSU. I built **Cuss for Canvas** at
 Cal Hacks 13.0 (UC Berkeley's hackathon, October 2026): an AI study assistant, powered by
 Anthropic's Claude, that helps students keep up with Canvas. I have ADHD, and keeping
 track of several fast-moving courses at once is hard for me, so I built the tool I wanted.
@@ -37,7 +37,7 @@ of personal access tokens, which I understand are restricted. Could you create a
 
 - **Key name:** Cuss for Canvas
 - **Redirect URI:** `https://cuss.onrender.com/auth/callback`
-- **Owner email:** [your SFSU email]
+- **Owner email:** belboheisy@sfsu.edu
 - **Access:** read-only for everything except sending Inbox messages and replies the student approves.
   If you enforce scopes, these are the endpoints the app uses:
   - `GET /api/v1/users/:user_id/profile`
@@ -79,4 +79,4 @@ I'm happy to demo the app in person or answer any security or privacy questions.
 
 Thank you,
 Belal Elboheisy
-[your SFSU email]
+belboheisy@sfsu.edu
