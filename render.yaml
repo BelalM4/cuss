@@ -11,6 +11,8 @@ services:
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: DATABASE_URL
+        sync: false
       - key: NODE_VERSION
         value: "22"
       - key: HOST

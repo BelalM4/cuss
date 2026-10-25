@@ -64,7 +64,22 @@ export async function startCuss(env = {}) {
     child.stdout.on("data", on);
     child.stderr.on("data", on);
   });
-  return { url: `http://localhost:${port}`, dataDir, stop: () => child.kill() };
+  let stopped;
+  const exited = new Promise((resolve) => {
+    child.once("exit", resolve);
+    if (child.exitCode !== null) resolve();
+  });
+  return {
+    url: `http://localhost:${port}`,
+    dataDir,
+    stop: () => {
+      if (!stopped) {
+        stopped = exited;
+        child.kill();
+      }
+      return stopped;
+    },
+  };
 }
 
 // A browser-like client with its own cookie jar.
