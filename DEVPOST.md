@@ -35,7 +35,7 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 - **Try it:** https://cuss.onrender.com (click "Try the student demo" or "Professor demo", no account needed)
 - **Code:** https://github.com/BelalM4/cuss
 - **Impact dashboard:** https://cuss.onrender.com/impact
-- **Demo video:** [YouTube link]
+- **Demo video:** https://youtu.be/iZonoqqxo8Q (AI replies in the recording are scripted; the live demo is real)
 
 ## Built with (tags)
 `node.js` `express` `javascript` `html` `css` `canvas-lms` `canvas-api` `oauth2` `claude` `anthropic` `web-speech-api` `render`
