@@ -162,4 +162,4 @@ Things to try:
 
 Built at Cal Hacks 13.0. Install it on a phone by opening the link and tapping **Add to Home Screen**. For App Store and Google Play builds, see **`mobile/STORE-GUIDE.md`**.
 
-Presenting Cuss? See **`DEMO-SCRIPT.md`** for the 2-minute table pitch, judge Q&A, and a pre-demo checklist.
+Presenting Cuss? See **`DEMO-SCRIPT.md`** for the 3-minute table pitch, judge Q&A, and a pre-demo checklist.

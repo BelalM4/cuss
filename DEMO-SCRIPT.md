@@ -1,6 +1,6 @@
 # Cuss: Cal Hacks 13.0 table pitch (2 minutes, live demo)
 
-The organizer's downloaded Hacker Guide allows **teams of 1–4**, recommends a **two-minute pitch**, and schedules table judging for **10:30 AM–12:30 PM Sunday**. Be at your assigned table by 10:30 and stay for the whole window. Submission closes **Sunday, October 25 at 9:00 AM Pacific**. This guide resolves the public Devpost page's inconsistent team-size and pitch-duration fields. Follow any later on-site announcement.
+**Official judging info (Cal Hacks announcement):** submit on Devpost by **9:00 AM Sunday** with every prize track selected. Arrive at the **Palace of Fine Arts by 9:30 AM**, find your assigned table (up to 3 teams share one), and be ready by **10:30 AM**. Stay for the **whole 10:30 AM–12:30 PM** window. At least three judges, each with up to 5 minutes: prepare a **three-minute pitch** with a **live demo**, and have a **locally stored demo video**. **Personal hotspots are banned** (spectrum analyzers; violators are disqualified), so if the venue Wi-Fi fails, play the local video.
 
 ## Saturday night / Sunday morning checklist
 - [ ] **Devpost submitted before 9:00 AM Sunday.** Submit a draft tonight and keep editing (see `DEVPOST.md`). Add your teammates.
@@ -11,13 +11,13 @@ The organizer's downloaded Hacker Guide allows **teams of 1–4**, recommends a 
 - [ ] Microphone already allowed (click the mic once beforehand).
 - [ ] Optional: on your phone, **Settings → Add to iPhone Calendar** once, so you can show deadlines and readings in your real iPhone Calendar if a judge asks.
 - [ ] Demo classes already know when they meet (BIOL 230 Mon/Wed, HIST 120 Tue/Thu, MATH 226 Mon/Wed/Fri), so "next class" works right after **Start the demo over**.
-- [ ] Backup video of a perfect run on your phone, in case the venue Wi-Fi ("Cal Hacks 13.0") fails.
+- [ ] **Required:** `cuss-demo-voiceover.mp4` saved locally on the laptop (and phone), not just on YouTube. Test that it plays with Wi-Fi off. No personal hotspots.
 
 ---
 
-## The 2-minute pitch (with the slides)
+## The 3-minute pitch (with the slides)
 
-**Before each judge:** student demo already signed in on localhost (Settings → **Start the demo over**), auto-send **off**, deck open in another tab on slide 1. Switch tabs with **Ctrl+Tab** (or click the tab).
+**Before each judge:** student demo signed in on localhost (Settings → **Start the demo over**), auto-send **off**, deck open in another tab on slide 1. Also keep a **private/incognito window signed in to the Professor demo** so you can switch instantly. Switch tabs with **Ctrl+Tab**.
 
 | Time | Slide | Do | Say |
 |---|---|---|---|
@@ -27,12 +27,15 @@ The organizer's downloaded Hacker Guide allows **teams of 1–4**, recommends a 
 | 0:20–0:50 | *app* | Type **"What should I work on tonight? Anything missing?"** Point at one assignment, like the missing one. | "This is a practice Canvas account with sample classes, and the AI is real. You can see every step it takes: it's checking my deadlines and missing work, then telling me where to start." |
 | 0:50–1:20 | *app* | Type **"Make a two-question practice quiz from the BIOL 230 lecture slides."** Answer one question and show the explanation. | "It reads my actual course files, like PDFs, PowerPoints and Word docs, and turns them into practice questions." |
 | 1:20–1:40 | *app* | Type **"Draft an email to Dr. Chen asking about Wednesday office hours."** Leave it unsent. | "When I need help, Cuss finds the right instructor and drafts the message. Nothing sends until I review it." |
-| 1:40–1:50 | **4 · Impact** | Switch back to the slides | "There's also a professor mode for spotting missing work and preparing student check-ins. We measure impact inside the app: missing work over time, emails actually sent, and quiz scores. The next step is a pilot at SF State once Canvas access is approved." |
-| 1:50–2:00 | **5 · Try it** | Leave the QR code up | "Canvas stores the information. Cuss helps students act on it. Scan this to try it yourself." |
+| 1:40–2:00 | *app* | Type **"The Wilson speech reading is due next class, remind me tomorrow night."** Point at the card's Add to Calendar / Add to Reminders, then **Open class**. | "Professors mention readings that never show up in Canvas. I just say it, and Cuss files it under that class for next class, with a reminder." |
+| 2:00–2:30 | *app (professor window)* | Switch to the private window. Type **"Who's falling behind?"** | "Professors use the same login. Cuss switches to professor mode and shows who needs a check-in, so a student like me gets reached before midterms, not after. Nothing reaches students until the professor approves it." |
+| 2:30–2:45 | **4 · Impact** | Switch back to the slides | "On safety: every step is shown, messages are drafts by default, and it's instructed to refuse graded work. We already count missing work over time, emails actually sent and quiz scores, and the next step is a pilot at SF State once Canvas access is approved." |
+| 2:45–3:00 | **5 · Try it** | Leave the QR code up | "Canvas stores the information. Cuss helps students act on it. Scan this to try it yourself." |
 
 **While the AI is thinking** (real answers can take 10–20 seconds), keep talking: point at the step bubbles ("now it's reading the lecture PDF").
 **If the quiz picks the wrong file,** ask again with "from the Lecture 15 membrane transport slides."
-**If anything breaks,** say "let me show you the recording" and play the backup video.
+**If anything breaks or the Wi-Fi drops,** say "let me show you the recording" and play `cuss-demo-voiceover.mp4` from the laptop. (Its AI replies are scripted; say so.) Never turn on a hotspot.
+**If a judge has less time,** skip the reading (1:40) and professor (2:00) steps; that is the 2-minute version.
 
 ### Backup slides (after the QR slide) for judges' questions
 
