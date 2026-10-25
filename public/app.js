@@ -278,7 +278,7 @@ async function loadTeacherDashboard() {
       $(id).classList.toggle("hidden", !needs);
     }
     $("#welcomeSub").innerHTML = needs || grading
-      ? `<b>${needs} student${needs === 1 ? "" : "s"}</b> could use a check-in and <b>${grading} submission${grading === 1 ? "" : "s"}</b> are waiting to be graded.`
+      ? `<b>${needs} student${needs === 1 ? "" : "s"}</b> could use a check-in and <b>${grading}</b> to grade.`
       : "Everyone's on track and nothing is waiting to be graded.";
     const box = $("#missingList");
     // Professor layout: students first, then the class's upcoming deadlines.
@@ -1298,21 +1298,21 @@ $("#resetDemoBtn").addEventListener("click", async () => {
 // Swap in professor suggestions and dashboard labels.
 function useTeacherLayout() {
   const ideas = [
-    ["alert", "Who's falling behind?", "Missing work and low scores", "Which students in my courses are falling behind? Show missing work and scores, and suggest who to reach out to first."],
-    ["check", "What needs grading?", "Submissions waiting", "What needs grading in my courses?"],
-    ["message", "Answer student messages", "Summaries and reply drafts", "Check my Canvas inbox and help me answer my students' messages."],
+    ["alert", "Who's behind?", "Missing work and low scores", "Which students in my courses are falling behind? Show missing work and scores, and suggest who to reach out to first."],
+    ["check", "What to grade", "Submissions waiting", "What needs grading in my courses?"],
+    ["message", "Student messages", "Summaries and reply drafts", "Check my Canvas inbox and help me answer my students' messages."],
     ["mail", "Nudge students", "Kind check-ins about missing work", "Draft kind, private check-in messages to students who have missing work."],
-    ["megaphone", "Draft an announcement", "Reminders, changes, encouragement", "Draft a course announcement reminding students about the next quiz and how to prepare."],
-    ["help", "Practice quiz for students", "From your lecture files", "Make a practice quiz for my students from my latest lecture slides."],
+    ["megaphone", "Announcement", "Reminders, changes, encouragement", "Draft a course announcement reminding students about the next quiz and how to prepare."],
+    ["help", "Practice quiz", "From your lecture files", "Make a practice quiz for my students from my latest lecture slides."],
   ];
   const grid = $(".suggestions");
   grid.replaceChildren(
     ...ideas.map(([ic, title, sub, prompt]) =>
-      el("button", { class: "suggestion", onclick: () => send(prompt) }, el("span", { html: icon(ic, 22) }), el("b", {}, title)),
+      el("button", { class: "suggestion", title: sub, onclick: () => send(prompt) }, iconEl(ic, 22), el("b", {}, title)),
     ),
   );
   const labels = document.querySelectorAll(".stat-label");
-  ["students", "need a check-in", "to grade"].forEach((t, i) => labels[i] && (labels[i].textContent = t));
+  ["students", "check-ins", "to grade"].forEach((t, i) => labels[i] && (labels[i].textContent = t));
   document.querySelectorAll(".panel-label").forEach((l) => {
     if (l.textContent === "Your impact with Cuss") l.textContent = "Your impact with Cuss";
     if (l.textContent === "Courses") l.textContent = "Your classes";
