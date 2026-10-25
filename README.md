@@ -47,7 +47,7 @@ Canvas has everything a student needs, but it's a filing cabinet, not an assista
 Students click **"Log in with SFSU Canvas"**, sign in on the usual school login page, and Cuss:
 
 - **Reminds them about due dates.** It alerts them 3 days, 1 day and 3 hours before anything unsubmitted is due (adjustable) and when there's a new announcement. A one-click calendar export covers Google, Apple and Outlook.
-- **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. You also get an alert when a professor writes back.
+- **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. Cuss checks for new replies about every minute and alerts you when a professor writes back.
 - **Writes emails to professors.** It finds the right instructor or TA, writes a polite message, and sends it through Canvas Inbox when the student presses **Send** (or says *"send it"*).
 - **Helps them study.** It reads their actual course pages, assignments, syllabus and **course files: PDFs (including diagrams and tables), PowerPoint slides with speaker notes, Word documents, images and text files**, explains topics, and makes **flashcards** and **practice quizzes**.
 - **Keeps every class organized.** Each class has its own **Files & notes**: Cuss brings in the class's Canvas files, students upload their own notes, slides or photos, write notes, and add readings or to-dos like *"chapter 4 is due next class"* (even when it isn't a Canvas assignment). Set the days a class meets and "next class" works everywhere, with reminders. Cuss reads all of it when you study, and can save notes it writes for you.

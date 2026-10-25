@@ -27,6 +27,7 @@ const state = {
   status: null,
   openDraft: null, // newest unsent email draft, for the "send it" voice command
   voiceMode: false,
+  view: 0, // bumps whenever the chat on screen changes, so an old reply stops drawing into it
 };
 
 // ---------------------------------------------------------------- utilities
@@ -382,6 +383,7 @@ function setChatTitle(t) {
 
 const welcomeNode = $("#welcome");
 function resetMessages() {
+  state.view++;
   $("#messages").replaceChildren(welcomeNode);
   welcomeNode.classList.remove("hidden");
   state.openDraft = null;
@@ -575,7 +577,10 @@ function draftCard(draft) {
 
   const sendLabel = `${icon(isAnnouncement ? "megaphone" : "send", 16)} ${isAnnouncement ? "Post to course" : isReply ? "Send reply" : "Send via Canvas"}`;
   const sendBtn = el("button", { class: "btn", html: sendLabel });
+  let sending = false;
   const send = async () => {
+    if (sending) return;
+    sending = true;
     sendBtn.disabled = true;
     sendBtn.textContent = "Sending…";
     try {
@@ -586,6 +591,7 @@ function draftCard(draft) {
       else toast("Message sent", `Your message went to ${draft.recipients.map((r) => r.name).join(", ")}.`, { iconName: "send" });
       if (state.speakReplies || state.voiceMode) speak("Sent. Your message is on its way.");
     } catch (err) {
+      sending = false;
       sendBtn.disabled = false;
       sendBtn.innerHTML = sendLabel;
       toast("Couldn't send", err.message, { iconName: "alert" });
@@ -742,7 +748,11 @@ function quizCard({ title, questions }) {
 
 async function send(text, { viaVoice = false } = {}) {
   text = text.trim();
-  if (!text || state.busy) return null;
+  if (!text) return null;
+  if (state.busy) {
+    toast("One moment", "Cuss is still finishing the last answer.", { iconName: "clock" });
+    return null;
+  }
 
   // Voice shortcut: "send it" sends the open email draft.
   if (viaVoice && state.openDraft && /^(yes,? )?(send( it| the (email|message))?|go ahead and send( it)?)[.!]?$/i.test(text)) {
@@ -753,6 +763,8 @@ async function send(text, { viaVoice = false } = {}) {
 
   state.busy = true;
   $("#sendBtn").disabled = true;
+  const view = state.view;
+  const onScreen = () => state.view === view;
   addUserMessage(text);
   $("#input").value = "";
   autosize();
@@ -793,6 +805,9 @@ async function send(text, { viaVoice = false } = {}) {
         buffer = buffer.slice(nl + 1);
         if (!line.trim()) continue;
         const ev = JSON.parse(line);
+        // The student switched chats: the reply keeps saving to its own chat
+        // on the server, but stops drawing on this screen.
+        if (!onScreen()) continue;
         if (ev.type === "text") {
           if (!bot && !ev.delta.trim()) continue;
           clearTyping();
@@ -824,7 +839,7 @@ async function send(text, { viaVoice = false } = {}) {
     }
   } catch (err) {
     clearTyping();
-    botRow(el("div", { class: "error-text" }, err.message));
+    if (onScreen()) botRow(el("div", { class: "error-text" }, err.message));
   } finally {
     clearTyping();
     endBot();
@@ -834,6 +849,7 @@ async function send(text, { viaVoice = false } = {}) {
   }
 
   if (/remind|due|deadline|submitted/i.test(text)) loadDashboard();
+  if (!onScreen()) return null;
   let reply = plainText(replyParts.filter((t) => t.trim()).join("\n"));
   if (state.voiceMode && madeCard && !reply) reply = "I put it on your screen.";
   return reply;

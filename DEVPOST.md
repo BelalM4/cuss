@@ -53,7 +53,7 @@ We wanted an assistant that already knows your semester: one you can just ask, "
 Students sign in with their school's normal Canvas login, and Cuss takes it from there:
 
 - **Never miss a deadline.** A "Today" dashboard shows what's due this week, missing work and grades. Cuss sends reminders days and hours before anything unsubmitted is due, and exports every deadline to Google/Apple/Outlook Calendar.
-- **Your inbox, handled.** Cuss reads your Canvas Inbox, summarizes what professors need from you, and drafts replies. You get an alert the moment a professor writes back.
+- **Your inbox, handled.** Cuss reads your Canvas Inbox, summarizes what professors need from you, and drafts replies. Cuss checks for new replies about every minute and alerts you when a professor writes back.
 - **Emails to professors.** Ask "email my bio professor about office hours" and Cuss finds the right instructor and writes a polite, specific message. Nothing is sent until you press Send.
 - **Study from your real notes.** Cuss opens your actual course pages, syllabus and files (**PDF lecture slides with their diagrams, PowerPoint decks with speaker notes, Word documents and photos of notes**), explains the material, and builds interactive flashcards and practice quizzes from them, instead of from random internet content.
 - **Every class organized.** Each class has its own files and notes: Canvas files Cuss brings in, your own uploads and notes, and readings like "chapter 4 is due next class" even when they aren't Canvas assignments, with reminders. Cuss studies from all of it.

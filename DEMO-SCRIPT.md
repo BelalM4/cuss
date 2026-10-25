@@ -20,39 +20,37 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 **0:00 – The problem (15 s)**
 > "I'm Belal, a student at SF State. Every student juggles four or five Canvas courses that move fast: deadlines in one place, announcements in another, readings the professor only mentions out loud. Canvas has everything, but it's a filing cabinet, not an assistant. For me it's even harder because I have ADHD, so I built Cuss, for every student and teacher."
 
-**0:15 – What Cuss is (10 s)**
+**0:15 – What Cuss is (5 s)**
 > "Cuss is an AI assistant that signs in to your Canvas and handles your semester. Here it is, live."
 
-**0:25 – What's due + live steps (15 s)**
-Click **What's due?** and point at the step bubbles as they appear.
-> "It's checking my deadlines and reading my professors' announcements right now. You can see every step. And it caught that my quiz was moved."
+One flow, start to finish:
 
-**0:40 – Inbox loop (25 s)**
-Under **Messages**, click **Prof. Ortiz**.
-> "My history professor offered to reopen a quiz I missed. Cuss summarized it and drafted a reply. Nothing sends until I approve it."
+**0:20 – "What needs my attention?" (25 s)**
+Type: **"What needs my attention this week?"** Point at the step bubbles as they appear.
+> "It's checking my deadlines, announcements and messages right now, and I can see every step. It caught that my biology quiz moved, and that my history professor offered to reopen a quiz."
 
-Press **Send reply**.
-> "And Cuss alerts me the moment professors answer."
-(The demo professor replies in about 15 seconds. Keep going; the pop-up lands during the next step.)
+**0:45 – Explain a deadline (20 s)**
+Type: **"What do I need to know for Quiz 5?"**
+> "Instead of guessing, it opens my professor's actual Lecture 15 slides from Canvas and tells me what's on the quiz."
 
-**1:05 – "Due next class" (20 s)**
-Type: **"The Wilson speech reading is due next class, remind me tomorrow night"**.
-> "Professors assign readings out loud that never show up in Canvas. I just say it, and Cuss files it in my history class for next class, with a reminder."
-Point at the card's **Add to Calendar** and **Add to Reminders** buttons, then tap **Open class**.
-> "Every class has its own files and notes: the Canvas lectures, my own uploads, and what's due next class. On my iPhone this all goes straight into Calendar."
-Close the class page.
+**1:05 – Quiz me from the real lecture notes (25 s)**
+Type: **"Quiz me on it."** Answer one question.
+> "The questions come from my professor's real PDF, diagrams and all, not random internet content."
 
-**1:25 – Study from real notes (20 s)**
-Type: **"Quiz me on the Lecture 15 slides for Quiz 5"**.
-> "It opened my professor's actual PDF slides from Canvas, diagrams and all, and made a quiz from them."
-Answer one question.
+**1:30 – Draft a professor email (20 s)**
+Type: **"Email Dr. Chen and ask if I can come to office hours before the quiz."**
+> "It finds my professor and writes a polite, specific email. Nothing sends until I review it and press Send."
+Don't press Send unless a judge asks.
 
-**1:45 – Voice (10 s, skip if you're short on time)**
-Tap **Talk** (or the sound-wave button) and ask: **"What should I work on tonight?"**
-
-**1:55 – Impact + close (10 s)**
-> "We measure impact inside the app: missing assignments over time, reminders delivered, emails actually sent, and quiz scores. It's ready for SF State as soon as the school approves it, and it works at any Canvas school. Scan this to try it yourself."
+**1:50 – Close (10 s)**
+> "We measure impact inside the app: missing assignments over time, reminders, emails actually sent, and quiz scores. It's ready for SF State as soon as the school approves it, and it works at any Canvas school. Scan this to try it yourself."
 Hand over the QR code.
+
+### If there's time, or a judge asks
+- **Professor mode:** Settings → Log out → **Professor demo** → "Who's falling behind?" → "Draft an announcement about Quiz 5." *"Same Canvas login; professors can reach struggling students sooner."*
+- **Due next class:** "The Wilson speech reading is due next class, remind me tomorrow night" → the card's **Add to Calendar** and **Add to Reminders**, then **Open class**.
+- **Inbox:** under Messages click **Prof. Ortiz** → reply draft → **Send reply**. The demo professor answers about 15 seconds later; Cuss checks for new replies about every minute, so the alert can take a minute or so.
+- **Voice:** tap **Talk**, ask "What should I work on tonight?"
 
 ---
 

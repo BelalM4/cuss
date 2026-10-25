@@ -452,34 +452,49 @@ app.post("/api/chat", async (req, res) => {
 
 // --- Sending drafted emails (only ever triggered by the student) --------------
 
+// Drafts being sent right now (per student), so a double tap or two open
+// tabs can never deliver the same message twice.
+const sendingDrafts = new Set();
+
 app.post(
   "/api/drafts/:id/send",
   wrap(async (req, res) => {
-    const draft = chats.getDraft(req.params.id);
-    if (!draft) return res.status(404).json({ error: "That draft expired. Ask me to write it again." });
-    if (draft.status === "sent") return res.json({ ok: true, alreadySent: true });
-    const subject = String(req.body?.subject ?? draft.subject).trim();
-    const body = String(req.body?.body ?? draft.body).trim();
-    if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
-    if (draft.kind === "reply") {
-      await canvas.replyToConversation(draft.conversationId, body);
-    } else if (draft.kind === "announcement") {
-      await canvas.postAnnouncement(draft.courseId, subject, body);
-    } else {
-      await canvas.sendMessage({
-        courseId: draft.courseId,
-        recipientIds: draft.recipients.map((r) => r.id),
-        subject,
-        body,
-      });
+    const lockKey = `${req.userId}:${req.params.id}`;
+    if (sendingDrafts.has(lockKey)) return res.status(409).json({ error: "That message is already being sent." });
+    sendingDrafts.add(lockKey);
+    try {
+      await sendDraft(req, res);
+    } finally {
+      sendingDrafts.delete(lockKey);
     }
-    Object.assign(draft, { status: "sent", subject, body });
-    chats.saveDraft(draft);
-    chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
-    recordImpact({ reply: "reply_sent", announcement: "announcement_posted" }[draft.kind] || "email_sent");
-    res.json({ ok: true });
   }),
 );
+
+async function sendDraft(req, res) {
+  const draft = chats.getDraft(req.params.id);
+  if (!draft) return res.status(404).json({ error: "That draft expired. Ask me to write it again." });
+  if (draft.status === "sent") return res.json({ ok: true, alreadySent: true });
+  const subject = String(req.body?.subject ?? draft.subject).trim();
+  const body = String(req.body?.body ?? draft.body).trim();
+  if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
+  if (draft.kind === "reply") {
+    await canvas.replyToConversation(draft.conversationId, body);
+  } else if (draft.kind === "announcement") {
+    await canvas.postAnnouncement(draft.courseId, subject, body);
+  } else {
+    await canvas.sendMessage({
+      courseId: draft.courseId,
+      recipientIds: draft.recipients.map((r) => r.id),
+      subject,
+      body,
+    });
+  }
+  Object.assign(draft, { status: "sent", subject, body });
+  chats.saveDraft(draft);
+  chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
+  recordImpact({ reply: "reply_sent", announcement: "announcement_posted" }[draft.kind] || "email_sent");
+  res.json({ ok: true });
+}
 
 const PORT = Number(process.env.PORT) || 3000;
 // Only this computer can reach the app by default. When hosting it for other
