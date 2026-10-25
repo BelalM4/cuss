@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B5BF6"/>
+      <stop offset=".55" stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <!-- Glass: light from the top, shade toward the bottom -->
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".3"/>
+      <stop offset=".55" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2E0A5C" stop-opacity=".22"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".75"/>
+      <stop offset=".3" stop-color="#fff" stop-opacity=".1"/>
+      <stop offset=".7" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2E0A5C" stop-opacity=".45"/>
+    </linearGradient>
+    <!-- The raised mark: white face, lilac sides -->
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset=".6" stop-color="#F6F2FF"/>
+      <stop offset="1" stop-color="#E4DAFF"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/>
+      <stop offset=".42" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="cast" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <path id="c" d="M676.3 347.7 A232 232 0 1 0 676.3 676.3" fill="none" stroke-linecap="round" stroke-width="124"/>
+    <path id="spark" d="M732 410 C744 488 756 500 836 512 C756 524 744 536 732 614 C720 536 708 524 628 512 C708 500 720 488 732 410 Z"/>
+    <mask id="markMask">
+      <use href="#c" stroke="#fff"/>
+      <use href="#spark" fill="#fff"/>
+    </mask>
+  </defs>
+
+  <rect width="1024" height="1024" rx="232" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="232" fill="url(#gloss)"/>
+  <rect x="8" y="8" width="1008" height="1008" rx="224" fill="none" stroke="url(#rim)" stroke-width="16"/>
+
+  <!-- Shadow the mark casts on the tile -->
+  <g transform="translate(0 40)" filter="url(#cast)" opacity=".5">
+    <use href="#c" stroke="#2E0A5C"/>
+    <use href="#spark" fill="#2E0A5C"/>
+  </g>
+  <!-- Depth: the sides of the raised mark -->
+  <g transform="translate(0 22)">
+    <use href="#c" stroke="#8B6CF0"/>
+    <use href="#spark" fill="#8B6CF0"/>
+  </g>
+  <g transform="translate(0 11)">
+    <use href="#c" stroke="#C9B8FF"/>
+    <use href="#spark" fill="#C9B8FF"/>
+  </g>
+  <!-- Face -->
+  <use href="#c" stroke="url(#face)"/>
+  <use href="#spark" fill="url(#face)"/>
+  <!-- Highlight across the top of the face -->
+  <rect x="200" y="250" width="660" height="520" fill="url(#sheen)" mask="url(#markMask)" opacity=".7"/>
+</svg>
