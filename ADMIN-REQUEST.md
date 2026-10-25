@@ -9,7 +9,7 @@ through **Help** (the ? icon) in Canvas's left menu. Fill in the parts in [brack
 
 Hello,
 
-I'm [your name], a student at SFSU ([your major], SF State ID [your ID]). I've built
+I'm Belal Elboheisy, a student at SFSU ([your major], SF State ID [your ID]). I've built
 **Cuss for Canvas**, a study assistant that helps students keep up with Canvas:
 
 - reminders before assignments are due, and a calendar export of deadlines
@@ -58,5 +58,5 @@ administrators can do this on a student's behalf.)
 I'm happy to demo the app or answer any security or privacy questions.
 
 Thank you,
-[your name]
+Belal Elboheisy
 [your SFSU email]

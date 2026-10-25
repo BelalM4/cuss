@@ -1,7 +1,7 @@
 # Devpost submission: Cuss (Cal Hacks 13.0)
 
 Copy each section into the matching Devpost field. Replace the `[brackets]` with true details from your own experience.
-**Deadline: Sunday 9:00 AM.** Submit a draft Saturday night, then keep editing. Add every teammate on Devpost.
+**Deadline: Sunday 9:00 AM.** Submit a draft Saturday night, then keep editing. Team: Belal Elboheisy (solo).
 
 ## Prize tracks to select
 - **Anthropic: Claude for Public Benefit** (see the track checklist right below)
@@ -103,7 +103,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 - That trust matters most for student-facing AI: showing the steps, citing the course material, and never sending anything without consent.
 
 ## What's next for Cuss
-- **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
+- **Official approval at San Francisco State University** (I'm requesting a Canvas developer key), then a pilot with students.
 - App Store and Google Play release with native push notifications (the Capacitor project is ready).
 - **Cuss for Professors** (already working in the demo): instructors see who's falling behind and what needs grading, answer student messages, nudge students with missing work, and post announcements. It's the other half of the loop: the same students we serve get reached sooner by their professors.
 - Google Calendar and school email (Gmail/Outlook) integration.
