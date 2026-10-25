@@ -47,12 +47,12 @@
     <!-- Middle: conversation -->
     <main class="chat">
       <header class="chat-head">
-        <button class="icon-btn ghost only-mobile" id="menuBtn" title="Chats" aria-label="Chats"><i data-icon="menu"></i></button>
+        <button class="icon-btn ghost only-mobile" id="menuBtn" aria-controls="sidebar" aria-expanded="false" title="Chats" aria-label="Chats"><i data-icon="menu"></i></button>
         <div class="chat-title" id="chatTitle">New chat</div>
         <div class="head-actions">
           <span class="demo-pill hidden" id="demoPill">DEMO</span>
           <button class="toggle" id="speakToggle" aria-pressed="false" title="Read replies out loud" aria-label="Read replies out loud"><i data-icon="volume"></i><span>Voice replies</span></button>
-          <button class="icon-btn ghost only-narrow" id="todayBtn" title="Today" aria-label="Today"><i data-icon="calendar"></i><span class="badge hidden" id="todayBadge"></span></button>
+          <button class="icon-btn ghost only-narrow" id="todayBtn" aria-controls="today" aria-expanded="false" title="Today" aria-label="Today"><i data-icon="calendar"></i><span class="badge hidden" id="todayBadge"></span></button>
         </div>
       </header>
 
@@ -60,14 +60,14 @@
         <section class="welcome" id="welcome">
           <div class="orb small-orb"><span></span></div>
           <h1 id="welcomeTitle">Hey there 👋</h1>
-          <p class="welcome-sub" id="welcomeSub">I'm connected to your Canvas. Ask me anything, or tap the mic and just talk.</p>
+          <p class="welcome-sub" id="welcomeSub">Choose a task to get started.</p>
           <div class="suggestions">
-            <button class="suggestion" data-prompt="What's due this week? Anything missing?"><i data-icon="clock"></i><b>What's due?</b><span>Deadlines &amp; missing work</span></button>
-            <button class="suggestion" data-prompt="Help me write an email to one of my professors."><i data-icon="mail"></i><b>Email a professor</b><span>Polite, clear, ready to send</span></button>
-            <button class="suggestion" data-prompt="Quiz me on the topic for my next upcoming quiz or exam."><i data-icon="help"></i><b>Quiz me</b><span>Practice for what's next</span></button>
-            <button class="suggestion" data-prompt="Make me flashcards from the most recent module in one of my courses."><i data-icon="layers"></i><b>Flashcards</b><span>From your course notes</span></button>
-            <button class="suggestion" data-prompt="Make me a realistic study plan for the next 7 days based on my deadlines."><i data-icon="chart"></i><b>Plan my week</b><span>Around your real deadlines</span></button>
-            <button class="suggestion" data-prompt="Check my Canvas inbox. Any messages from my professors I need to deal with?"><i data-icon="message"></i><b>Check my messages</b><span>Replies from professors</span></button>
+            <button class="suggestion" data-prompt="What's due this week? Anything missing?"><i data-icon="clock"></i><b>What's due?</b></button>
+            <button class="suggestion" data-prompt="Help me write an email to one of my professors."><i data-icon="mail"></i><b>Email a professor</b></button>
+            <button class="suggestion" data-prompt="Quiz me on the topic for my next upcoming quiz or exam."><i data-icon="help"></i><b>Quiz me</b></button>
+            <button class="suggestion" data-prompt="Make me flashcards from the most recent module in one of my courses."><i data-icon="layers"></i><b>Flashcards</b></button>
+            <button class="suggestion" data-prompt="Make me a realistic study plan for the next 7 days based on my deadlines."><i data-icon="chart"></i><b>Plan my week</b></button>
+            <button class="suggestion" data-prompt="Check my Canvas inbox. Any messages from my professors I need to deal with?"><i data-icon="message"></i><b>Check my messages</b></button>
           </div>
         </section>
       </div>
@@ -79,7 +79,7 @@
           <button type="button" class="comp-btn voice-mode-btn" id="voiceModeBtn" title="Voice conversation" aria-label="Voice conversation"><i data-icon="wave"></i></button>
           <button type="submit" class="send" id="sendBtn" title="Send" aria-label="Send"><i data-icon="up"></i></button>
         </form>
-        <div class="composer-hint" id="voiceHint">Cuss reads your Canvas so you don't have to. <kbd>Enter</kbd> to send · <kbd>⌘M</kbd> to talk</div>
+        <div class="composer-hint" id="voiceHint"><kbd>Enter</kbd> to send · <kbd>Shift Enter</kbd> for a new line</div>
       </div>
     </main>
 
@@ -92,17 +92,18 @@
         </div>
         <button class="icon-btn ghost" id="refreshBtn" title="Refresh" aria-label="Refresh"><i data-icon="refresh"></i></button>
       </div>
+      <p id="workspaceStatus" class="sr-only" role="status">Loading your workspace.</p>
       <div class="stats">
         <div class="stat"><div class="stat-num" id="statDue">–</div><div class="stat-label">due this week</div></div>
         <div class="stat warn"><div class="stat-num" id="statMissing">–</div><div class="stat-label">missing</div></div>
         <div class="stat good"><div class="stat-num" id="statGrade">–</div><div class="stat-label">avg grade</div></div>
       </div>
       <div class="panel-label">Messages <span class="count hidden" id="inboxCount"></span></div>
-      <ul class="inbox" id="inboxList"><li class="skeleton short"></li></ul>
+      <ul class="inbox" id="inboxList" aria-busy="true"><li class="skeleton short" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li></ul>
       <div class="panel-label">Coming up</div>
       <div id="missingList"></div>
-      <ul class="deadlines" id="deadlineList">
-        <li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li>
+      <ul class="deadlines" id="deadlineList" aria-busy="true">
+        <li class="skeleton" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li><li class="skeleton" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li><li class="skeleton" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li>
       </ul>
       <div class="panel-label" id="readingLabel">Readings &amp; to-dos</div>
       <ul class="deadlines" id="readingList"></ul>
@@ -110,13 +111,13 @@
         <button type="button" class="cal-link" id="calSubscribeBtn"><i data-icon="calendar"></i>Add to my iPhone Calendar</button>
         <a class="cal-link subtle" href="/calendar.ics" download>or download .ics</a>
       </div>
-      <div class="panel-label">Classes <span class="label-hint">tap for files &amp; notes</span></div>
-      <ul class="courses" id="courseList"><li class="skeleton short"></li><li class="skeleton short"></li></ul>
+      <div class="panel-label">Classes</div>
+      <ul class="courses" id="courseList" aria-busy="true"><li class="skeleton short" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li><li class="skeleton short" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line narrow"></span></li></ul>
       <div class="panel-label">Your impact with Cuss</div>
       <div class="impact-row" id="impactRow"></div>
       <div class="notify-box hidden" id="notifyBox">
-        <b>Never miss a deadline</b>
-        <p>Turn on notifications and I'll remind you before things are due.</p>
+        <b>Deadline reminders</b>
+        <p>Get deadline reminders while Cuss is running.</p>
         <button class="btn small" id="enableNotify">Enable reminders</button>
       </div>
     </aside>
@@ -132,7 +133,7 @@
   </nav>
 
   <!-- Full-screen voice conversation -->
-  <div class="voice-overlay hidden" id="voiceOverlay" role="dialog" aria-modal="true" aria-label="Voice conversation" aria-live="polite">
+  <dialog class="voice-overlay hidden" id="voiceOverlay" aria-label="Voice conversation" aria-live="polite">
     <button class="icon-btn ghost voice-close" id="voiceClose" title="End voice mode" aria-label="End voice mode"><i data-icon="x"></i></button>
     <div class="orb big-orb" id="voiceOrb"><span></span></div>
     <div class="voice-state" id="voiceState">Listening…</div>
@@ -141,7 +142,7 @@
       <button class="btn ghost" id="voiceTap">Tap to talk</button>
       <button class="btn danger-solid" id="voiceEnd">End</button>
     </div>
-  </div>
+  </dialog>
 
   <!-- Settings -->
   <dialog id="settings" aria-label="Settings">
@@ -192,7 +193,7 @@
       <h3 class="settings-sub">What Cuss remembers about you</h3>
       <ul class="memory-list" id="memoryList"></ul>
       <div class="memory-add">
-        <input id="memoryInput" placeholder="e.g. I'm a nursing major and learn best with practice questions" />
+        <input id="memoryInput" aria-label="Note for Cuss to remember" placeholder="e.g. I'm a nursing major and learn best with practice questions" />
         <button type="button" class="btn small" id="memoryAdd">Add</button>
       </div>
 
@@ -259,7 +260,7 @@
     </div>
   </dialog>
 
-  <div class="toasts" id="toasts"></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
   <script src="icons.js"></script>
   <script src="app.js" type="module"></script>
 </body>

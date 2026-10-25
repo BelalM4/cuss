@@ -17,15 +17,14 @@ import {
   serverConfig,
   ssoEnabled,
   runAsUser,
+  restoreUser,
   deleteUserData,
-  getState,
-  saveState,
-  readAppJson,
-  writeAppJson,
 } from "./lib/store.js";
 import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
 import * as library from "./lib/library.js";
 import { listUserIds } from "./lib/store.js";
+
+import { reserveAiUsage } from "./lib/usage.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -36,7 +35,10 @@ app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {
   if (req.method === "GET" || req.method === "HEAD") return next();
   const origin = req.headers.origin;
-  if (origin && new URL(origin).host !== req.headers.host) return res.status(403).json({ error: "Cross-site request blocked." });
+  if (origin) {
+    try { if (new URL(origin).host !== req.headers.host) return res.status(403).json({ error: "Cross-site request blocked." }); }
+    catch { return res.status(403).json({ error: "Invalid request origin." }); }
+  }
   next();
 });
 
@@ -139,6 +141,7 @@ app.post(
     if (!r.ok) return res.status(400).json({ error: "Canvas didn't accept that token." });
     const profile = await r.json();
     const userId = String(profile.id);
+    restoreUser(userId);
     runAsUser(userId, () =>
       saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "" }),
     );
@@ -199,7 +202,7 @@ async function detectRole() {
 
 // --- Settings --------------------------------------------------------------
 
-app.get("/api/status", async (req, res) => {
+app.get("/api/status", wrap(async (req, res) => {
   let c = getConfig();
   if (!c.role && c.canvasToken) {
     await detectRole().catch(() => {});
@@ -217,7 +220,7 @@ app.get("/api/status", async (req, res) => {
     briefingTime: c.briefingTime,
     autoSendEmails: c.autoSendEmails,
   });
-});
+}));
 
 app.post(
   "/api/settings",
@@ -415,27 +418,14 @@ app.post(
 app.post("/api/chat", async (req, res) => {
   const { conversationId, text, voice, timeZone } = req.body || {};
   if (!conversationId || !text) return res.status(400).json({ error: "Missing message." });
-  // Everyone shares the app owner's AI key, so keep a daily cap per student.
-  const limit = Number(process.env.DAILY_MESSAGE_LIMIT) || 150;
-  const state = getState();
-  const today = new Date().toISOString().slice(0, 10);
-  if (state.usageDay !== today) Object.assign(state, { usageDay: today, usageCount: 0 });
-  if (state.usageCount >= limit) {
-    return res.status(429).json({ error: `You've reached today's limit of ${limit} messages. It resets tomorrow.` });
+  if (typeof conversationId !== "string" || !/^[a-zA-Z0-9-]{8,64}$/.test(conversationId)) return res.status(400).json({ error: "Bad chat id." });
+  if (timeZone) {
+    try { new Intl.DateTimeFormat("en", { timeZone: String(timeZone) }); }
+    catch { return res.status(400).json({ error: "Enter a valid time zone." }); }
+    saveConfig({ timeZone: String(timeZone) });
   }
-  // ...and an overall cap, since demo visitors each count as a new student.
-  const totalLimit = Number(process.env.DAILY_TOTAL_LIMIT) || 0;
-  if (totalLimit) {
-    const usage = readAppJson("usage.json", {});
-    if (usage.day !== today) Object.assign(usage, { day: today, count: 0 });
-    if (usage.count >= totalLimit) {
-      return res.status(429).json({ error: "Cuss has hit today's demo limit. Thanks for trying it! It resets tomorrow." });
-    }
-    usage.count++;
-    writeAppJson("usage.json", usage);
-  }
-  state.usageCount++;
-  saveState(state);
+  try { reserveAiUsage(); }
+  catch (err) { return res.status(err.status || 500).json({ error: err.message }); }
   recordImpact("chat");
   res.setHeader("Content-Type", "application/x-ndjson");
   res.setHeader("Cache-Control", "no-cache");

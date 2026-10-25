@@ -1,6 +1,6 @@
 # Cuss: Cal Hacks 13.0 table pitch (2 minutes, live demo)
 
-Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get about two minutes, and they want to see it **working live**. The whole team must be at the table.
+The organizer's downloaded Hacker Guide allows **teams of 1–4**, recommends a **two-minute pitch**, and schedules table judging for **10:30 AM–12:30 PM Sunday**. Be at your assigned table by 10:30 and stay for the whole window. Submission closes **Sunday, October 25 at 9:00 AM Pacific**. This guide resolves the public Devpost page's inconsistent team-size and pitch-duration fields. Follow any later on-site announcement.
 
 ## Saturday night / Sunday morning checklist
 - [ ] **Devpost submitted before 9:00 AM Sunday.** Submit a draft tonight and keep editing (see `DEVPOST.md`). Add your teammates.
@@ -55,7 +55,7 @@ Judges look for: (1) a **named community**: for this track say: "Cuss is for eve
 
 ### Know where Claude can go wrong
 Judges will ask. Have these answers ready:
-- **Wrong or made-up deadlines:** Cuss never answers from memory. It calls Canvas tools every time and shows each step, so students can see where an answer came from. Dates come straight from the Canvas planner.
+- **Wrong or made-up deadlines:** Cuss is instructed to fetch Canvas data and shows its tool steps. The model can still miss a change or misinterpret a date, so students should verify important deadlines in Canvas and announcements.
 - **Sending the wrong email to a professor:** every email and reply is a draft the student must approve. Auto-send is an opt-in with a warning.
 - **Academic dishonesty:** the system prompt tells Claude not to write graded work or answer live quizzes; it teaches, quizzes and plans instead.
 - **Privacy:** Claude only sees what the student already sees in Canvas. Students can delete their data and revoke access anytime.

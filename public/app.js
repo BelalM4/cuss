@@ -153,8 +153,21 @@ function scrollDown(force = false) {
 
 // ---------------------------------------------------------------- dashboard
 
+function loading(target) {
+  const node = $(target);
+  node.setAttribute("aria-busy", "true");
+  if (!node.children.length) node.append(el("li", { class: "skeleton", "aria-hidden": "true" }, el("span", { class: "skeleton-line" }), el("span", { class: "skeleton-line narrow" })));
+}
+function loaded(target) { $(target).setAttribute("aria-busy", "false"); }
+function loadError(target, message, retry) {
+  $(target).replaceChildren(el("li", { class: "load-error" }, el("span", {}, message), el("button", { type: "button", class: "link-btn", onclick: retry }, "Try again")));
+  loaded(target);
+}
+
+
 async function loadDashboard() {
   if (!state.status) return;
+  loading("#deadlineList");
   $("#todayDate").textContent = new Date().toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
   try {
     const { upcoming, missing } = await api("/api/deadlines?days=14");
@@ -170,7 +183,7 @@ async function loadDashboard() {
         { class: `deadline ${done ? "done" : f.cls}`, href: d.url || "#", target: "_blank", rel: "noopener", style: `animation-delay:${i * 40}ms` },
         el("div", { class: "bar" }),
         el("div", { class: "info" }, el("div", { class: "title" }, d.title), el("div", { class: "meta" }, `${d.course || ""} · ${f.when}`)),
-        el("span", { class: "when" }, done ? "done" : f.rel),
+        el("span", { class: "when" }, done ? "Done" : f.rel === "past due" ? "Overdue" : `${f.cls === "soon" ? "Soon · " : ""}${f.rel}`),
       );
       list.append(el("li", {}, a));
     });
@@ -201,15 +214,19 @@ async function loadDashboard() {
     }
     $("#welcomeSub").innerHTML =
       soon || missing.length
-        ? `You have <b>${soon} thing${soon === 1 ? "" : "s"} due in the next 48 hours</b>${missing.length ? ` and <b>${missing.length} missing</b>` : ""}. Want me to help you get ahead?`
-        : "You're all caught up for the next two days. Want to study ahead?";
+        ? `You have <b>${soon} thing${soon === 1 ? "" : "s"} due in the next 48 hours</b>${missing.length ? ` and <b>${missing.length} missing</b>` : ""}.`
+        : "Nothing due in the next two days.";
   } catch (err) {
-    if (!err.quiet) $("#deadlineList").replaceChildren(el("li", { class: "empty-note" }, err.message));
+    if (!err.quiet) loadError("#deadlineList", "Couldn’t load deadlines.", loadDashboard);
+  } finally {
+    loaded("#deadlineList");
+    $("#workspaceStatus").textContent = "Deadline check complete.";
   }
   loadInbox();
   loadImpact();
   loadReadings();
   if (state.status?.role === "teacher") return loadTeacherDashboard();
+  loading("#courseList");
   try {
     const courses = await api("/api/courses");
     state.courses = courses;
@@ -220,18 +237,21 @@ async function loadDashboard() {
         const bar = el("div", { style: "width:0%" });
         requestAnimationFrame(() => setTimeout(() => (bar.style.width = `${Math.min(100, c.currentScore ?? 0)}%`), 60));
         return el(
-          "li",
-          { class: "course clickable", tabindex: "0", role: "button", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id), onkeydown: (e) => e.key === "Enter" && openClass(c.id) },
+          "li", {}, el("button",
+          { type: "button", class: "course clickable", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id) },
           el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, c.currentGrade || (c.currentScore != null ? `${c.currentScore}%` : ""), el("span", { class: "chev", html: icon("right", 14) }))),
           el("div", { class: "gbar" }, bar),
-        );
+        ));
       }),
     );
-  } catch {}
+  } catch {
+    loadError("#courseList", "Couldn’t load classes.", loadDashboard);
+  } finally { loaded("#courseList"); }
 }
 
 // Professor mode: students who need attention and grading that's waiting.
 async function loadTeacherDashboard() {
+  loading("#courseList");
   try {
     const courses = await api("/api/teacher/overview");
     state.courses = courses.map((c) => ({ id: c.id, name: c.name }));
@@ -246,7 +266,7 @@ async function loadTeacherDashboard() {
       $(id).classList.toggle("hidden", !needs);
     }
     $("#welcomeSub").innerHTML = needs || grading
-      ? `<b>${needs} student${needs === 1 ? "" : "s"}</b> could use a check-in and <b>${grading} submission${grading === 1 ? "" : "s"}</b> are waiting to be graded. Want me to draft the outreach?`
+      ? `<b>${needs} student${needs === 1 ? "" : "s"}</b> could use a check-in and <b>${grading} submission${grading === 1 ? "" : "s"}</b> are waiting to be graded.`
       : "Everyone's on track and nothing is waiting to be graded.";
     const box = $("#missingList");
     // Professor layout: students first, then the class's upcoming deadlines.
@@ -256,9 +276,9 @@ async function loadTeacherDashboard() {
       ...courses.flatMap((c) =>
         c.atRisk.map((s) =>
           el(
-            "div",
+            "button",
             {
-              class: "inbox-item",
+              class: "inbox-item", type: "button",
               title: "Ask Cuss to draft a check-in",
               onclick: () => {
                 closePanels();
@@ -283,16 +303,17 @@ async function loadTeacherDashboard() {
         const bar = el("div", { style: "width:0%" });
         requestAnimationFrame(() => setTimeout(() => (bar.style.width = `${Math.min(100, avg ?? 0)}%`), 60));
         return el(
-          "li",
-          { class: "course clickable", tabindex: "0", role: "button", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id), onkeydown: (e) => e.key === "Enter" && openClass(c.id) },
+          "li", {}, el("button",
+          { type: "button", class: "course clickable", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id) },
           el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, avg != null ? `avg ${avg}%` : "", el("span", { class: "chev", html: icon("right", 14) }))),
           el("div", { class: "gbar" }, bar),
-        );
+        ));
       }),
     );
   } catch (err) {
     $("#missingList").replaceChildren(el("div", { class: "empty-note" }, err.message));
-  }
+    loadError("#courseList", "Couldn’t load classes.", loadTeacherDashboard);
+  } finally { loaded("#courseList"); }
 }
 
 async function loadImpact() {
@@ -314,40 +335,31 @@ async function loadImpact() {
 
 async function loadInbox() {
   const ul = $("#inboxList");
+  loading("#inboxList");
   try {
     const unread = await api("/api/inbox");
     $("#inboxCount").textContent = unread.length;
     $("#inboxCount").classList.toggle("hidden", !unread.length);
     ul.replaceChildren();
     if (!unread.length) ul.append(el("li", { class: "empty-note" }, "No unread messages."));
-    unread.forEach((c, i) => {
+    for (const c of unread) {
       const from = c.participants.find((p) => p !== state.status?.studentName) || c.participants[0] || "Canvas";
-      ul.append(
-        el(
-          "li",
-          {
-            class: "inbox-item",
-            style: `animation-delay:${i * 40}ms`,
-            title: "Open with Cuss",
-            onclick: () => {
-              closePanels();
-              send(`Open my Canvas message "${c.subject}" from ${from} and tell me what I need to do.`);
-            },
-          },
-          el("span", { class: "avatar mini" }, initials(from)),
-          el("div", { class: "info" }, el("div", { class: "from" }, from, el("span", { class: "dot-unread" })), el("div", { class: "subj" }, c.subject), el("div", { class: "snip" }, c.lastMessage)),
-        ),
-      );
-    });
-  } catch {
-    ul.replaceChildren(el("li", { class: "empty-note" }, "Couldn't load messages."));
-  }
+      ul.append(el("li", {}, el("button", {
+        type: "button", class: "inbox-item", "aria-label": `Open message: ${c.subject}, from ${from}`,
+        onclick: () => { closePanels(); send(`Open my Canvas message "${c.subject}" from ${from} and tell me what I need to do.`); },
+      }, el("span", { class: "avatar mini" }, initials(from)),
+      el("span", { class: "info" }, el("span", { class: "from" }, from, el("span", { class: "dot-unread", "aria-hidden": "true" })), el("span", { class: "subj" }, c.subject), el("span", { class: "snip" }, c.lastMessage)))));
+    }
+  } catch { loadError("#inboxList", "Couldn’t load messages.", loadInbox); }
+  finally { loaded("#inboxList"); }
 }
 
 // ---------------------------------------------------------------- chat history
 
 async function loadChatList() {
-  const list = await api("/api/chats").catch(() => []);
+  let list;
+  try { list = await api("/api/chats"); }
+  catch { return loadError("#chatList", "Couldn’t load chats.", loadChatList); }
   const ul = $("#chatList");
   ul.replaceChildren();
   if (!list.length) ul.append(el("li", { class: "empty-note" }, "Your chats will show up here."));
@@ -356,9 +368,8 @@ async function loadChatList() {
     ul.append(
       el(
         "li",
-        { class: "chat-item" + (c.id === state.chatId ? " active" : ""), onclick: () => openChat(c.id), title: c.title },
-        el("span", { html: icon(c.kind === "briefing" ? "sun" : "message", 16) }),
-        el("span", { class: "t" }, c.title),
+        { class: "chat-item" + (c.id === state.chatId ? " active" : ""), title: c.title },
+        el("button", { type: "button", class: "chat-open", onclick: () => openChat(c.id), "aria-current": c.id === state.chatId ? "true" : undefined }, el("span", { html: icon(c.kind === "briefing" ? "sun" : "message", 16) }), el("span", { class: "t" }, c.title)),
         el("button", {
           class: "del",
           title: "Delete chat",
@@ -625,15 +636,22 @@ function draftCard(draft) {
 }
 
 function flashcardCard({ title, cards }) {
+  if (!cards?.length) return el("div", { class: "card" }, "No flashcards returned. Try asking again.");
   let order = cards.map((_, i) => i);
   let i = 0;
-  const front = el("div", { class: "flashcard-face front" });
-  const back = el("div", { class: "flashcard-face back" });
-  const flip = el("div", { class: "flashcard", title: "Click or press Space to flip" }, el("div", { class: "flashcard-inner" }, front, back));
+  const front = el("span", { class: "flashcard-face front" });
+  const back = el("span", { class: "flashcard-face back", "aria-hidden": "true" });
+  const flip = el("button", { type: "button", class: "flashcard", "aria-label": "Show answer", "aria-pressed": "false" }, el("span", { class: "flashcard-inner" }, front, back));
+  const deckId = crypto.randomUUID();
+  front.id = `question-${deckId}`; back.id = `answer-${deckId}`;
   const dots = el("div", { class: "fc-progress" }, cards.map(() => el("i")));
   const counter = el("span", { class: "counter" });
   const show = () => {
     flip.classList.remove("flipped");
+    flip.setAttribute("aria-pressed", "false");
+    flip.setAttribute("aria-label", "Show answer");
+    flip.setAttribute("aria-describedby", front.id);
+    front.removeAttribute("aria-hidden"); back.setAttribute("aria-hidden", "true");
     const c = cards[order[i]];
     front.replaceChildren(el("small", {}, "Question"), c.front);
     back.replaceChildren(el("small", {}, "Answer"), c.back);
@@ -642,7 +660,13 @@ function flashcardCard({ title, cards }) {
   };
   const next = () => ((i = (i + 1) % cards.length), show());
   const prev = () => ((i = (i - 1 + cards.length) % cards.length), show());
-  flip.addEventListener("click", () => flip.classList.toggle("flipped"));
+  flip.addEventListener("click", () => {
+    const flipped = flip.classList.toggle("flipped");
+    flip.setAttribute("aria-pressed", String(flipped));
+    flip.setAttribute("aria-label", flipped ? "Show question" : "Show answer");
+    flip.setAttribute("aria-describedby", flipped ? back.id : front.id);
+    front.setAttribute("aria-hidden", String(flipped)); back.setAttribute("aria-hidden", String(!flipped));
+  });
   show();
   const card = el(
     "div",
@@ -652,7 +676,7 @@ function flashcardCard({ title, cards }) {
     el(
       "div",
       { class: "card-actions" },
-      el("button", { class: "btn ghost small", onclick: prev, html: icon("left", 15) }),
+      el("button", { class: "btn ghost small", "aria-label": "Previous flashcard", onclick: prev, html: icon("left", 15) }),
       el("button", { class: "btn small", onclick: next, html: `Next ${icon("right", 15)}` }),
       el("button", { class: "btn ghost small", title: "Read aloud", html: icon("volume", 15), onclick: () => speak(flip.classList.contains("flipped") ? back.textContent.replace(/^Answer/, "") : front.textContent.replace(/^Question/, "")) }),
       el("button", {
@@ -669,11 +693,10 @@ function flashcardCard({ title, cards }) {
     ),
   );
   card.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") next();
-    else if (e.key === "ArrowLeft") prev();
-    else if (e.key === " ") e.preventDefault(), flip.classList.toggle("flipped");
+    if (e.target !== card && e.target !== flip) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
   });
-  card.addEventListener("mouseenter", () => card.focus({ preventScroll: true }));
   return card;
 }
 
@@ -957,6 +980,7 @@ function openVoiceMode() {
   }
   state.voiceMode = true;
   $("#voiceOverlay").classList.remove("hidden");
+  $("#voiceOverlay").showModal();
   voiceTurn();
 }
 
@@ -964,8 +988,11 @@ function closeVoiceMode() {
   state.voiceMode = false;
   stopListening();
   stopSpeaking();
+  $("#voiceOverlay").close();
   $("#voiceOverlay").classList.add("hidden");
 }
+
+$("#voiceOverlay").addEventListener("cancel", (e) => { e.preventDefault(); closeVoiceMode(); });
 
 let voices = [];
 function loadVoices() {
@@ -1209,7 +1236,7 @@ function useTeacherLayout() {
   const grid = $(".suggestions");
   grid.replaceChildren(
     ...ideas.map(([ic, title, sub, prompt]) =>
-      el("button", { class: "suggestion", onclick: () => send(prompt) }, el("span", { html: icon(ic, 22) }), el("b", {}, title), el("span", {}, sub)),
+      el("button", { class: "suggestion", onclick: () => send(prompt) }, el("span", { html: icon(ic, 22) }), el("b", {}, title)),
     ),
   );
   const labels = document.querySelectorAll(".stat-label");
@@ -1248,24 +1275,50 @@ function autosize() {
   t.style.height = Math.min(t.scrollHeight, 180) + "px";
 }
 
+function syncPanelAccessibility() {
+  const mobile = matchMedia("(max-width:760px)").matches;
+  const history = mobile && $("#sidebar").classList.contains("open");
+  const today = matchMedia("(max-width:1180px)").matches && $("#today").classList.contains("open");
+  $(".chat").inert = history || today;
+  $("#sidebar").inert = mobile && today;
+  $("#today").inert = history;
+  $("#menuBtn").setAttribute("aria-expanded", String(history));
+  $("#todayBtn").setAttribute("aria-expanded", String(today));
+}
+window.addEventListener("resize", syncPanelAccessibility);
+
 function closePanels() {
+  const wasToday = $("#today").contains(document.activeElement);
+  const drawerFocused = wasToday || $("#sidebar").contains(document.activeElement);
   $("#sidebar").classList.remove("open");
   $("#today").classList.remove("open");
   $("#scrim").classList.remove("show");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+  $("#todayBtn").setAttribute("aria-expanded", "false");
+  syncPanelAccessibility();
   setActiveTab("chat");
+  if (drawerFocused) {
+    if (matchMedia("(max-width:760px)").matches) document.querySelector('#tabbar [data-tab="chat"]').focus();
+    else if (wasToday) $("#todayBtn").focus();
+  }
 }
 
 // Phone tab bar (iOS style).
 function setActiveTab(name) {
-  document.querySelectorAll("#tabbar button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll("#tabbar button").forEach((b) => { b.classList.toggle("active", b.dataset.tab === name); if (b.dataset.tab === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
 }
 function openTab(name) {
   if (name === "voice") return openVoiceMode();
   if (name === "settings") return openSettings();
+  $("#menuBtn").setAttribute("aria-expanded", String(name === "history"));
+  $("#todayBtn").setAttribute("aria-expanded", String(name === "today"));
   $("#sidebar").classList.toggle("open", name === "history");
   $("#today").classList.toggle("open", name === "today");
   $("#scrim").classList.remove("show");
+  syncPanelAccessibility();
   setActiveTab(name);
+  if (name === "history") $("#newChatBtn").focus();
+  else if (name === "today") $("#refreshBtn").focus();
   if (navigator.vibrate) navigator.vibrate(8);
 }
 document.querySelectorAll("#tabbar button").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
@@ -1297,19 +1350,28 @@ $("#newChatBtn").addEventListener("click", newChat);
 $("#refreshBtn").addEventListener("click", loadDashboard);
 $("#menuBtn").addEventListener("click", () => {
   $("#sidebar").classList.add("open");
+  $("#menuBtn").setAttribute("aria-expanded", "true");
+  syncPanelAccessibility();
+  $("#newChatBtn").focus();
   $("#scrim").classList.add("show");
 });
 $("#todayBtn").addEventListener("click", () => {
   $("#today").classList.add("open");
+  $("#todayBtn").setAttribute("aria-expanded", "true");
+  syncPanelAccessibility();
+  $("#refreshBtn").focus();
   $("#scrim").classList.add("show");
 });
 $("#scrim").addEventListener("click", closePanels);
 document.querySelectorAll(".suggestion").forEach((s) => s.addEventListener("click", () => send(s.dataset.prompt)));
 document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") e.preventDefault(), dictate();
-  if (e.key === "Escape" && state.voiceMode) closeVoiceMode();
+  if (e.key === "Escape") { if (state.voiceMode) closeVoiceMode(); else closePanels(); }
 });
 if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = loadVoices;
+
+setActiveTab("chat");
+syncPanelAccessibility();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
 
@@ -1318,6 +1380,8 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").cat
   if (!Recognition) $("#micBtn").title = "Voice input needs Chrome, Edge or Safari";
   try {
     await refreshStatus();
+    // Scheduled briefings and reminders must use the same zone as this browser.
+    await api("/api/settings", { method: "POST", body: { timeZone } });
   } catch (err) {
     if (err.message !== "Please log in.") toast("Can't reach the Cuss server", "Make sure `npm start` is running.", { iconName: "alert" });
     return;
@@ -1362,11 +1426,12 @@ function dueText(item, nextClass) {
 
 // Today panel: readings and to-dos from every class, soonest first.
 async function loadReadings() {
+  loading("#readingList");
   const list = $("#readingList");
   try {
     const items = await api("/api/library/upcoming");
     if (!items.length) {
-      list.replaceChildren(el("li", { class: "empty-note" }, "Nothing yet. Tap a class below to add readings, notes and files."));
+      list.replaceChildren(el("li", { class: "empty-note" }, "No readings added."));
       return;
     }
     list.replaceChildren(
@@ -1375,7 +1440,7 @@ async function loadReadings() {
         const cls = past || i.readBy === ymdLocal() ? "urgent" : i.readBy <= ymdLocal(new Date(Date.now() + 2 * 864e5)) ? "soon" : "later";
         return el(
           "li",
-          { class: `deadline ${cls}`, tabindex: "0", role: "button", onclick: () => openClass(i.courseId, i.id), onkeydown: (e) => e.key === "Enter" && openClass(i.courseId, i.id) },
+          { class: `deadline ${cls}`, tabindex: "0", role: "button", onclick: () => openClass(i.courseId, i.id), onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openClass(i.courseId, i.id); } } },
           el("span", { class: "bar" }),
           el("div", { class: "info" }, el("div", { class: "title" }, i.kind === "task" ? i.title : `Read: ${i.title}`), el("div", { class: "meta" }, `${shortCourse(courseById(i.courseId)?.name || "")}${i.remindAt ? " · 🔔 reminder set" : ""}`)),
           el("span", { class: "when" }, past ? "Late" : dayLabel(i.readBy).replace(/,.*/, "")),
@@ -1383,8 +1448,8 @@ async function loadReadings() {
       }),
     );
   } catch {
-    list.replaceChildren();
-  }
+    loadError("#readingList", "Couldn’t load readings.", loadReadings);
+  } finally { loaded("#readingList"); }
 }
 
 async function openClass(courseId, focusId = null) {
@@ -1458,7 +1523,7 @@ function renderClass() {
             { class: "lib-empty" },
             el("div", { class: "lib-empty-icon", html: icon("folder", 28) }),
             el("b", {}, "This class is empty"),
-            el("p", {}, "Upload your notes or slides, write a note, add a reading that's due next class, or let Cuss bring in the files from Canvas."),
+            el("p", {}, "Upload a file, add a note or reading, or import from Canvas."),
           ),
         ]),
   );

@@ -890,3 +890,72 @@ dialog.class-sheet { width: min(720px, calc(100vw - 24px)); }
 .lib-card { padding-bottom: 14px; }
 .lib-card .lib-card-title, .lib-card .lib-card-meta, .lib-card .lib-line { padding-left: 18px; padding-right: 18px; }
 .lib-card .lib-card-title { margin-top: 12px; }
+
+/* UI review: semantic status colors, readable controls and quieter loading. */
+:root {
+  --action: #0068d5;
+  --danger: #b42318;
+  --warn: #8a4b00;
+  --ok: #16713a;
+  --info: #005ea8;
+  --skeleton-base: #e4e6eb;
+  --skeleton-highlight: #f0f1f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --danger:#ff8a80; --warn:#ffc267; --ok:#75df9b; --info:#8ac8ff; --skeleton-base:#38383c; --skeleton-highlight:#48484e; }
+}
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.btn:not(.ghost):not(.danger):not(.danger-solid), .send, .toggle[aria-pressed="true"], .day-chip.on { background:var(--action); color:#fff; }
+.msg.user .bubble, .flashcard-face.back { background:var(--action); color:#fff; }
+.btn.danger-solid { background:#b42318; color:#fff; }
+.stat.good .stat-num { color:var(--text); }
+.deadline.soon .when { color:var(--warn); background:color-mix(in srgb,var(--warn) 12%,var(--panel)); }
+.deadline.urgent .when { color:var(--danger); background:color-mix(in srgb,var(--danger) 10%,var(--panel)); }
+.deadline.done .when { color:var(--ok); background:color-mix(in srgb,var(--ok) 10%,var(--panel)); }
+.skeleton { background:var(--panel-2); padding:14px; display:flex; flex-direction:column; justify-content:center; gap:9px; height:74px; animation:none; }
+.skeleton.short { height:55px; padding:10px 12px; }
+.skeleton-line { display:block; height:9px; width:82%; border-radius:4px; background:linear-gradient(90deg,var(--skeleton-base),var(--skeleton-highlight),var(--skeleton-base)); background-size:200% 100%; animation:shimmer 1.5s linear infinite; }
+.skeleton-line.narrow { width:52%; height:7px; }
+.load-error { list-style:none; padding:12px; border:1px solid var(--line); border-radius:12px; color:var(--danger); display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:13px; }
+.load-error .link-btn { margin-left:auto; min-height:32px; padding:3px 8px; }
+.chat-open { flex:1; min-width:0; display:flex; gap:9px; align-items:center; border:0; padding:5px 0; background:none; color:inherit; text-align:left; font:inherit; min-height:32px; }
+.chat-item:focus-within .del { opacity:1; }
+.chat-item .del { min-width:28px; min-height:28px; place-items:center; }
+@media (hover:none) { .chat-item .del { opacity:1; } }
+button.inbox-item, button.course { width:100%; text-align:left; font:inherit; color:inherit; }
+button.inbox-item { border:0; }
+button.course { border:0; background:transparent; }
+.inbox-item .info > .from, .inbox-item .info > .subj, .inbox-item .info > .snip { display:block; }
+.suggestion { min-height:72px; }
+.suggestion b { align-self:center; }
+button.flashcard { width:100%; padding:0; border:0; background:none; color:inherit; font:inherit; text-align:center; }
+button.flashcard .flashcard-inner { display:block; }
+.course.clickable:focus-visible, .composer textarea:focus-visible, button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+button, [role="button"], input[type="checkbox"] { scroll-margin:20px; }
+.chip, .link-btn { min-height:28px; }
+.lib-check { width:24px; height:24px; }
+.voice-overlay { width:100%; max-width:none; height:100dvh; max-height:none; margin:0; border:0; border-radius:0; }
+.voice-overlay:not([open]) { display:none; }
+.voice-overlay::backdrop { background:var(--bg); }
+@media (max-width:1180px) {
+  .today:not(.open) { visibility:hidden; pointer-events:none; }
+  .today.open { visibility:visible; pointer-events:auto; }
+}
+@media (max-width:760px) {
+  .sidebar:not(.open) { visibility:hidden; pointer-events:none; }
+  .sidebar.open { visibility:visible; pointer-events:auto; }
+}
+@media (prefers-reduced-motion:reduce) { .skeleton-line { animation:none; } }
+@media (forced-colors:active) {
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:3px solid Highlight; }
+  .when, .btn, .chip, .flashcard-face { border:1px solid ButtonText; }
+}
+:root { --accent:#0067cf; }
+@media (prefers-color-scheme:dark) { :root { --accent:#72b8ff; } }
+.when, .chip.accent { color:var(--info); }
+.grad-text, .welcome h1 .grad-text, .profs h2 { background:none; color:var(--accent); -webkit-background-clip:initial; background-clip:initial; }
+.composer textarea::placeholder { color:var(--muted); opacity:1; }
+@media (prefers-contrast:more) { :root { --line:currentColor; } .skeleton { border:1px solid var(--line); } }
+.suggestion { flex-direction:row; align-items:center; gap:12px; padding:16px; }
+.suggestion .ic { margin-bottom:0; }
+.suggestion b { text-align:left; }
