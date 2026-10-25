@@ -89,10 +89,10 @@ app.get("/auth/info", (req, res) => {
 
 // Step 1: send the student to the school's Canvas/SSO login page
 // (or the demo school's pretend login page).
-function beginLogin(res, demo) {
+function beginLogin(res, demo, hint = "") {
   const state = crypto.randomBytes(24).toString("base64url") + (demo ? ".demo" : "");
   res.append("Set-Cookie", `cuss_oauth_state=${state}; ${auth.cookieOptions(600)}`);
-  res.redirect(auth.authorizeUrl(state, { demo }));
+  res.redirect(auth.authorizeUrl(state, { demo, hint }));
 }
 
 app.get("/auth/login", (req, res) => {
@@ -102,7 +102,8 @@ app.get("/auth/login", (req, res) => {
 
 app.get("/auth/demo", (req, res) => {
   if (!serverConfig().demo) return res.redirect("/login.html?error=" + encodeURIComponent("The demo is turned off."));
-  beginLogin(res, true);
+  // ?as=professor opens the demo school as the BIOL 230 instructor.
+  beginLogin(res, true, req.query.as === "professor" ? "teacher" : "");
 });
 
 // Step 2: Canvas sends them back here with a one-time code.
@@ -115,7 +116,7 @@ app.get("/auth/callback", async (req, res) => {
   try {
     const userId = await auth.finishLogin(String(code), { demo: String(state).endsWith(".demo") });
     auth.startSession(res, userId);
-    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
+    runAsUser(userId, () => detectRole().then(() => Promise.all([checkReminders(), checkInbox()])).catch(() => {}));
     res.redirect("/");
   } catch (err) {
     console.error(err);
@@ -140,7 +141,7 @@ app.post(
       saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "" }),
     );
     auth.startSession(res, userId);
-    runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
+    runAsUser(userId, () => detectRole().then(() => Promise.all([checkReminders(), checkInbox()])).catch(() => {}));
     res.json({ ok: true });
   }),
 );
@@ -173,11 +174,24 @@ app.post(
   }),
 );
 
+// Professor or student? Canvas says so through course enrollments.
+async function detectRole() {
+  const courses = await canvas.listCourses();
+  const role = courses.some((c) => c.role === "teacher") ? "teacher" : "student";
+  saveConfig({ role });
+  return role;
+}
+
 // --- Settings --------------------------------------------------------------
 
-app.get("/api/status", (req, res) => {
-  const c = getConfig();
+app.get("/api/status", async (req, res) => {
+  let c = getConfig();
+  if (!c.role && c.canvasToken) {
+    await detectRole().catch(() => {});
+    c = getConfig();
+  }
   res.json({
+    role: c.role || "student",
     configured: isConfigured(),
     aiReady: Boolean(c.anthropicKey),
     demo: c.demo,
@@ -243,6 +257,28 @@ app.post("/api/impact/quiz", (req, res) => {
   recordImpact("quiz", { score, total });
   res.json({ ok: true });
 });
+
+// Professor dashboard: per course, students needing attention and grading waiting.
+app.get(
+  "/api/teacher/overview",
+  wrap(async (req, res) => {
+    const courses = (await canvas.listCourses()).filter((c) => c.role === "teacher");
+    const out = await Promise.all(
+      courses.map(async (c) => {
+        const [roster, queue] = await Promise.all([canvas.getRosterStatus(c.id).catch(() => null), canvas.getGradingQueue(c.id).catch(() => [])]);
+        return {
+          id: c.id,
+          name: c.name,
+          summary: roster?.summary || null,
+          atRisk: (roster?.students || []).filter((s) => s.missing > 0 || (s.currentScore != null && s.currentScore < 70)).slice(0, 6),
+          needsGrading: queue.reduce((n, a) => n + a.needsGrading, 0),
+          queue,
+        };
+      }),
+    );
+    res.json(out);
+  }),
+);
 
 // Unread Canvas Inbox messages for the Today panel.
 app.get(
@@ -345,6 +381,8 @@ app.post(
     if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
     if (draft.kind === "reply") {
       await canvas.replyToConversation(draft.conversationId, body);
+    } else if (draft.kind === "announcement") {
+      await canvas.postAnnouncement(draft.courseId, subject, body);
     } else {
       await canvas.sendMessage({
         courseId: draft.courseId,
@@ -356,7 +394,7 @@ app.post(
     Object.assign(draft, { status: "sent", subject, body });
     chats.saveDraft(draft);
     chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
-    recordImpact(draft.kind === "reply" ? "reply_sent" : "email_sent");
+    recordImpact({ reply: "reply_sent", announcement: "announcement_posted" }[draft.kind] || "email_sent");
     res.json({ ok: true });
   }),
 );

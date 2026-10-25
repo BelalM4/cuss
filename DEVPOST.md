@@ -105,6 +105,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 ## What's next for Cuss
 - **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
 - App Store and Google Play release with native push notifications (the Capacitor project is ready).
+- **Cuss for Professors** (already working in the demo): instructors see who's falling behind and what needs grading, answer student messages, nudge students with missing work, and post announcements. It's the other half of the loop: the same students we serve get reached sooner by their professors.
 - Google Calendar and school email (Gmail/Outlook) integration.
 - Study groups: shared flashcard decks and quiz battles for the same course.
 - Expansion to other Canvas schools: any school can enable Cuss with one approval.

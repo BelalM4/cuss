@@ -59,6 +59,9 @@ Judges will ask. Have these answers ready:
 - **Privacy:** Claude only sees what the student already sees in Canvas. Students can delete their data and revoke access anytime.
 - **Running autonomously:** independent mode can read and draft, but never sends messages on its own.
 
+## If a judge asks "what about professors?"
+Log out, click **Professor demo**, and show the Today panel: "Kevin has 2 missing assignments at 41%, and he messaged that he works nights." Ask **"Who's falling behind?"**, then **"Draft an announcement about Quiz 5"** → **Post to course**. One sentence: "Same Canvas login; Cuss switches to professor mode, so professors can reach struggling students sooner."
+
 ## Other likely questions
 - **Did you build this at Cal Hacks?** Yes, it was started at the event. The GitHub commit history shows it.
 - **How does it connect to Canvas?** Canvas's official OAuth2 sign-in through the school's SSO, the same way approved apps connect. Each school approves Cuss once, and then any student can log in.

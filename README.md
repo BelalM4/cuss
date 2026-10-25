@@ -12,6 +12,8 @@ A personal AI assistant for school. Students click **"Log in with SFSU Canvas"**
 
 **Try it without a school account:** click **▶ Try the demo** on the login page. You sign in on a practice login page for "Demo University" and get a sample student with real-looking classes, deadlines, professors and course notes. The AI is real, so chatting, quizzes, flashcards and emails all work, but demo emails go nowhere. This is handy for showing Cuss to schools.
 
+**Cuss for Professors.** When an instructor signs in, Cuss switches to professor mode automatically (Canvas tells it who teaches what): who's falling behind (missing work, low scores), what needs grading, summaries of and reply drafts for student messages, kind check-in messages to students with missing work, course announcements the professor reviews and posts, and practice quizzes built from their own lecture files. Student privacy comes first: grades are only ever shown to the professor, and nothing reaches students until the professor approves it. Try it with **Professor demo** on the login page.
+
 Each student's chats, notes and settings are private to them. Students can log out, or delete their data and disconnect at any time (Settings → *Delete my data*).
 
 ---

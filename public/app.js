@@ -174,9 +174,10 @@ async function loadDashboard() {
       list.append(el("li", {}, a));
     });
 
+    const teacher = state.status?.role === "teacher";
     const box = $("#missingList");
-    box.replaceChildren();
-    if (missing.length) {
+    if (!teacher) box.replaceChildren();
+    if (missing.length && !teacher) {
       box.append(
         el(
           "details",
@@ -187,6 +188,7 @@ async function loadDashboard() {
       );
     }
 
+    if (teacher) throw { quiet: true }; // the professor dashboard fills the rest
     const week = open.filter((d) => new Date(d.dueAt) - Date.now() < 7 * 864e5).length;
     const soon = open.filter((d) => new Date(d.dueAt) - Date.now() < 48 * 36e5).length;
     $("#statDue").textContent = week;
@@ -201,10 +203,11 @@ async function loadDashboard() {
         ? `You have <b>${soon} thing${soon === 1 ? "" : "s"} due in the next 48 hours</b>${missing.length ? ` and <b>${missing.length} missing</b>` : ""}. Want me to help you get ahead?`
         : "You're all caught up for the next two days. Want to study ahead?";
   } catch (err) {
-    $("#deadlineList").replaceChildren(el("li", { class: "empty-note" }, err.message));
+    if (!err.quiet) $("#deadlineList").replaceChildren(el("li", { class: "empty-note" }, err.message));
   }
   loadInbox();
   loadImpact();
+  if (state.status?.role === "teacher") return loadTeacherDashboard();
   try {
     const courses = await api("/api/courses");
     const scored = courses.filter((c) => c.currentScore != null);
@@ -224,11 +227,78 @@ async function loadDashboard() {
   } catch {}
 }
 
+// Professor mode: students who need attention and grading that's waiting.
+async function loadTeacherDashboard() {
+  try {
+    const courses = await api("/api/teacher/overview");
+    const sum = (f) => courses.reduce((n, c) => n + (f(c) || 0), 0);
+    const needs = sum((c) => c.atRisk.length);
+    const grading = sum((c) => c.needsGrading);
+    $("#statDue").textContent = sum((c) => c.summary?.students);
+    $("#statMissing").textContent = needs;
+    $("#statGrade").textContent = grading;
+    for (const id of ["#todayBadge", "#tabBadge"]) {
+      $(id).textContent = needs;
+      $(id).classList.toggle("hidden", !needs);
+    }
+    $("#welcomeSub").innerHTML = needs || grading
+      ? `<b>${needs} student${needs === 1 ? "" : "s"}</b> could use a check-in and <b>${grading} submission${grading === 1 ? "" : "s"}</b> are waiting to be graded. Want me to draft the outreach?`
+      : "Everyone's on track and nothing is waiting to be graded.";
+    const box = $("#missingList");
+    // Professor layout: students first, then the class's upcoming deadlines.
+    box.previousElementSibling.textContent = "Students needing attention";
+    if (!$("#comingUpLabel")) $("#deadlineList").before(el("div", { class: "panel-label", id: "comingUpLabel" }, "Coming up in your classes"));
+    box.replaceChildren(
+      ...courses.flatMap((c) =>
+        c.atRisk.map((s) =>
+          el(
+            "div",
+            {
+              class: "inbox-item",
+              title: "Ask Cuss to draft a check-in",
+              onclick: () => {
+                closePanels();
+                send(`Draft a kind, private check-in message to ${s.name} in ${c.name} about their missing work, offering help.`);
+              },
+            },
+            el("span", { class: "avatar mini" }, initials(s.name)),
+            el(
+              "div",
+              { class: "info" },
+              el("div", { class: "from" }, s.name),
+              el("div", { class: "snip" }, [s.missing ? `${s.missing} missing` : null, s.late ? `${s.late} late` : null, s.currentScore != null ? `${Math.round(s.currentScore)}% in ${c.name.split(" – ")[0]}` : null].filter(Boolean).join(" · ")),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (!needs) box.append(el("div", { class: "empty-note" }, "No one is behind right now."));
+    $("#courseList").replaceChildren(
+      ...courses.map((c) => {
+        const avg = c.summary?.classAverage;
+        const bar = el("div", { style: "width:0%" });
+        requestAnimationFrame(() => setTimeout(() => (bar.style.width = `${Math.min(100, avg ?? 0)}%`), 60));
+        return el(
+          "li",
+          { class: "course" },
+          el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, avg != null ? `avg ${avg}%` : "")),
+          el("div", { class: "gbar" }, bar),
+        );
+      }),
+    );
+  } catch (err) {
+    $("#missingList").replaceChildren(el("div", { class: "empty-note" }, err.message));
+  }
+}
+
 async function loadImpact() {
   try {
     const imp = await api("/api/impact");
     const c = imp.counts || {};
-    const items = [
+    const items = state.status?.role === "teacher" ? [
+      [(c.email_sent || 0) + (c.reply_sent || 0), "messages to students"],
+      [c.announcement_posted || 0, "announcements"],
+    ] : [
       [c.reminder || 0, "reminders"],
       [(c.email_sent || 0) + (c.reply_sent || 0), "emails sent"],
       [imp.quizzesTaken || 0, imp.quizAverage != null ? `quizzes · ${imp.quizAverage}% avg` : "quizzes"],
@@ -439,7 +509,7 @@ function renderStepGroup(steps = []) {
 function addCard(card) {
   welcomeNode.classList.add("hidden");
   const node =
-    card.kind === "draft" || card.kind === "reply" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : null;
+    card.kind === "draft" || card.kind === "reply" || card.kind === "announcement" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : null;
   if (node) $("#messages").append(node);
   scrollDown();
 }
@@ -450,6 +520,7 @@ function cardHead(iconName, title, ...extra) {
 
 function draftCard(draft) {
   const isReply = draft.kind === "reply";
+  const isAnnouncement = draft.kind === "announcement";
   const subject = el("input", { value: isReply ? `Re: ${draft.subject}` : draft.subject, "aria-label": "Subject", disabled: isReply });
   const body = el("textarea", { "aria-label": "Message" }, draft.body);
   const actions = el("div", { class: "card-actions" });
@@ -465,7 +536,11 @@ function draftCard(draft) {
   const card = el(
     "div",
     { class: "card" },
-    cardHead(isReply ? "message" : "mail", isReply ? "Reply in Canvas Inbox" : "Email to your instructor", status),
+    cardHead(
+      isAnnouncement ? "megaphone" : isReply ? "message" : "mail",
+      isAnnouncement ? "Course announcement" : isReply ? "Reply in Canvas Inbox" : state.status?.role === "teacher" ? "Message to students" : "Email to your instructor",
+      status,
+    ),
     el(
       "div",
       { class: "card-body" },
@@ -473,9 +548,9 @@ function draftCard(draft) {
         "div",
         { class: "mail-row" },
         el("span", { class: "k" }, "To"),
-        el("div", {}, draft.recipients.map((r) => el("span", { class: "recipient" }, el("span", { class: "avatar mini" }, initials(r.name)), r.name))),
+        el("div", {}, isAnnouncement ? el("span", { class: "recipient" }, `Everyone in ${draft.course || "the course"}`) : draft.recipients.map((r) => el("span", { class: "recipient" }, el("span", { class: "avatar mini" }, initials(r.name)), r.name))),
       ),
-      el("div", { class: "mail-row" }, el("span", { class: "k" }, "Subject"), subject),
+      el("div", { class: "mail-row" }, el("span", { class: "k" }, isAnnouncement ? "Title" : "Subject"), subject),
       quote,
       el("div", { class: "mail-body" }, body),
     ),
@@ -486,7 +561,8 @@ function draftCard(draft) {
     subject.disabled = body.disabled = true;
     status.textContent = "Sent";
     status.className = "chip ok";
-    actions.replaceChildren(el("span", { class: "sent-note", html: `${icon("check", 16)} ${isReply ? "Reply sent" : "Sent"} through Canvas Inbox` }));
+    status.textContent = isAnnouncement ? "Posted" : "Sent";
+    actions.replaceChildren(el("span", { class: "sent-note", html: `${icon("check", 16)} ${isAnnouncement ? "Posted to the course in Canvas" : `${isReply ? "Reply sent" : "Sent"} through Canvas Inbox`}` }));
     if (state.openDraft?.id === draft.id) state.openDraft = null;
   };
   if (draft.status === "sent") {
@@ -494,7 +570,7 @@ function draftCard(draft) {
     return card;
   }
 
-  const sendLabel = `${icon("send", 16)} ${isReply ? "Send reply" : "Send via Canvas"}`;
+  const sendLabel = `${icon(isAnnouncement ? "megaphone" : "send", 16)} ${isAnnouncement ? "Post to course" : isReply ? "Send reply" : "Send via Canvas"}`;
   const sendBtn = el("button", { class: "btn", html: sendLabel });
   const send = async () => {
     sendBtn.disabled = true;
@@ -503,7 +579,8 @@ function draftCard(draft) {
       await api(`/api/drafts/${draft.id}/send`, { method: "POST", body: { subject: isReply ? draft.subject : subject.value, body: body.value } });
       markSent();
       setTimeout(loadInbox, 1500);
-      toast("Message sent", `Your message went to ${draft.recipients.map((r) => r.name).join(", ")}.`, { iconName: "send" });
+      if (isAnnouncement) toast("Announcement posted", `Everyone in ${draft.course || "the course"} can see it now.`, { iconName: "megaphone" });
+      else toast("Message sent", `Your message went to ${draft.recipients.map((r) => r.name).join(", ")}.`, { iconName: "send" });
       if (state.speakReplies || state.voiceMode) speak("Sent. Your message is on its way.");
     } catch (err) {
       sendBtn.disabled = false;
@@ -1097,19 +1174,48 @@ $("#deleteAccountBtn").addEventListener("click", async () => {
 $("#resetDemoBtn").addEventListener("click", async () => {
   await api("/api/account/delete", { method: "POST" }).catch(() => {});
   store.set("chatId", null);
-  location.replace("/auth/demo");
+  location.replace(state.status?.role === "teacher" ? "/auth/demo?as=professor" : "/auth/demo");
 });
+
+// Swap in professor suggestions and dashboard labels.
+function useTeacherLayout() {
+  const ideas = [
+    ["alert", "Who's falling behind?", "Missing work and low scores", "Which students in my courses are falling behind? Show missing work and scores, and suggest who to reach out to first."],
+    ["check", "What needs grading?", "Submissions waiting", "What needs grading in my courses?"],
+    ["message", "Answer student messages", "Summaries and reply drafts", "Check my Canvas inbox and help me answer my students' messages."],
+    ["mail", "Nudge students", "Kind check-ins about missing work", "Draft kind, private check-in messages to students who have missing work."],
+    ["megaphone", "Draft an announcement", "Reminders, changes, encouragement", "Draft a course announcement reminding students about the next quiz and how to prepare."],
+    ["help", "Practice quiz for students", "From your lecture files", "Make a practice quiz for my students from my latest lecture slides."],
+  ];
+  const grid = $(".suggestions");
+  grid.replaceChildren(
+    ...ideas.map(([ic, title, sub, prompt]) =>
+      el("button", { class: "suggestion", onclick: () => send(prompt) }, el("span", { html: icon(ic, 22) }), el("b", {}, title), el("span", {}, sub)),
+    ),
+  );
+  const labels = document.querySelectorAll(".stat-label");
+  ["students", "need a check-in", "to grade"].forEach((t, i) => labels[i] && (labels[i].textContent = t));
+  document.querySelectorAll(".panel-label").forEach((l) => {
+    if (l.textContent === "Your impact with Cuss") l.textContent = "Your impact with Cuss";
+    if (l.textContent === "Courses") l.textContent = "Your classes";
+  });
+  $("#input").placeholder = "Ask Cuss about your classes…";
+}
 
 async function refreshStatus() {
   state.status = await api("/api/status");
   const s = state.status;
   const name = s.studentName || "there";
-  const first = name.split(" ")[0];
+  const parts = name.split(" ");
+  const teacher = s.role === "teacher";
+  const first = teacher && /^(dr|prof)\.?$/i.test(parts[0]) && parts.length > 1 ? `${parts[0]} ${parts.at(-1)}` : parts[0];
+  document.body.classList.toggle("teacher", teacher);
+  if (teacher) useTeacherLayout();
   const h = new Date().getHours();
   const hello = h < 5 ? "Up late" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   $("#welcomeTitle").innerHTML = `${hello}, <span class="grad-text">${escapeHtml(first)}</span>`;
   $("#whoName").textContent = s.studentName || "Student";
-  $("#whoSub").textContent = s.demo ? "Demo University" : s.schoolName || "Canvas";
+  $("#whoSub").textContent = `${teacher ? "Professor · " : ""}${s.demo ? "Demo University" : s.schoolName || "Canvas"}`;
   $("#schoolLine").textContent = s.independent ? "Independent mode on" : "for Canvas";
   $("#avatar").textContent = $("#avatar2").textContent = initials(s.studentName);
   $("#demoPill").classList.toggle("hidden", !s.demo);

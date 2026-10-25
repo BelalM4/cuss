@@ -15,6 +15,9 @@ const script = (text, step) => {
     ][Math.min(step, 2)];
   if (/inbox/i.test(text))
     return [[T("check_inbox", { unread_only: true })], [T("draft_reply", { conversation_id: 3001, body: "Yes please, thank you!" })], [{ type: "text", text: "Reply drafted." }]][Math.min(step, 2)];
+  if (/falling behind/i.test(text)) return [[T("roster_status", { course_id: 101 })], [{ type: "text", text: "Kevin needs a check-in." }]][Math.min(step, 1)];
+  if (/announcement/i.test(text))
+    return [[T("draft_announcement", { course_id: 101, title: "Quiz 5 reminder", message: "Quiz 5 is Tuesday at 10 AM. Review Lecture 15." })], [{ type: "text", text: "Drafted." }]][Math.min(step, 1)];
   if (/slides/i.test(text)) return [[T("read_course_item", { course_id: 101, item_type: "file", item_id: "4001" })], [{ type: "text", text: "Read them." }]][Math.min(step, 1)];
   return [[T("get_deadlines", { days_ahead: 7 })], [{ type: "text", text: "Here is your week." }]][Math.min(step, 1)];
 };
@@ -138,6 +141,31 @@ test("log out of all devices ends every session", async () => {
   assert.equal((await laptop.request("/api/status")).status, 200);
   await phone.request("/auth/logout-all", { method: "POST" });
   assert.equal((await laptop.request("/api/status")).status, 401);
+});
+
+test("professor demo: role, roster, grading queue and posting an announcement", async () => {
+  const prof = client(app.url);
+  await prof.loginDemo("Dr. Maya Chen", { professor: true });
+  assert.equal((await prof.json("/api/status")).role, "teacher");
+  const [course] = await prof.json("/api/teacher/overview");
+  assert.equal(course.summary.students, 8);
+  assert.equal(course.needsGrading, 3);
+  assert.ok(course.atRisk.some((s) => s.name === "Kevin Nguyen" && s.missing === 2));
+  const behind = await prof.chat("chat-prof-0001", "Who's falling behind?");
+  assert.ok(steps(behind.events).some((s) => s.includes("8 students")));
+  const { events } = await prof.chat("chat-prof-0002", "Draft an announcement about Quiz 5");
+  const [ann] = cardsOf(events);
+  assert.equal(ann.kind, "announcement");
+  await prof.json(`/api/drafts/${ann.id}/send`, { method: "POST", json: {} });
+  assert.equal((await prof.json("/api/impact")).counts.announcement_posted, 1);
+  assert.equal((await prof.json("/api/inbox")).length, 2); // two student questions waiting
+});
+
+test("students can't open professor data", async () => {
+  const s = client(app.url);
+  await s.loginDemo("Curious Student");
+  assert.equal((await s.json("/api/status")).role, "student");
+  assert.equal((await s.json("/api/teacher/overview")).length, 0);
 });
 
 test("public pages load", async () => {

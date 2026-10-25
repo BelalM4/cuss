@@ -45,7 +45,12 @@
 
       <a class="demo-btn hidden" id="demoBtn" href="/auth/demo">
         <span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
-        <span><b>Try the live demo</b><span>Sample student at “Demo University”. No account needed.</span></span>
+        <span><b>Try the student demo</b><span>Sample student at “Demo University”. No account needed.</span></span>
+      </a>
+
+      <a class="demo-btn hidden" id="profDemoBtn" href="/auth/demo?as=professor">
+        <span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
+        <span><b>Professor demo</b><span>Dr. Chen’s BIOL 230 class: who’s behind, grading, student messages.</span></span>
       </a>
 
       <div class="notice hidden" id="notReady"></div>
@@ -84,6 +89,7 @@
     }
     if (info.demo) {
       $("#demoBtn").classList.remove("hidden");
+      $("#profDemoBtn").classList.remove("hidden");
       // With no school login yet, the demo is the main way in.
       if (!info.sso) $("#demoBtn").classList.add("primary");
     }
