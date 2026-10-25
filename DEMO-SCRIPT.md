@@ -4,7 +4,7 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 
 ## Saturday night / Sunday morning checklist
 - [ ] **Devpost submitted before 9:00 AM Sunday.** Submit a draft tonight and keep editing (see `DEVPOST.md`). Add your teammates.
-- [ ] Hosted link works (Render). Open it at **10:15 AM** so the free server is awake.
+- [ ] Hosted link works (Render). Open it at **10:15 AM** so the free server is awake. **URL: pending deployment**
 - [ ] Laptop charged. Chrome open at the app, full screen (⌘ + Shift + F), zoomed in once (⌘ +).
 - [ ] Phone with the **QR code** (`your-link/share`) ready to hand to judges, or a second laptop tab with it.
 - [ ] **Settings → Start the demo over** right before each judge arrives, signed in as yourself.
@@ -16,7 +16,7 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 ## The 2-minute pitch
 
 **0:00 – The problem (15 s)**
-> "I'm Belal. I built Cuss for first-gen, working, commuting and transfer students at SF State, people like me with the least time to dig through Canvas. Every semester I juggle five courses, and every one is set up differently. Last month I missed [a real example: a quiz, an announcement, a professor's email] that was sitting in Canvas the whole time. Canvas has everything, but it's a filing cabinet, not an assistant."
+> "I'm Belal Elboheisy. I built Cuss for first-gen, working, commuting and transfer students at SF State, people like me with the least time to dig through Canvas. Every semester I juggle multiple courses, and every one is set up differently. A deadline, announcement, or professor's email can easily get buried. Canvas has everything, but it's a filing cabinet, not an assistant."
 
 **0:15 – What Cuss is (10 s)**
 > "Cuss is an AI assistant that signs in to your Canvas and handles your semester. Here it is, live."

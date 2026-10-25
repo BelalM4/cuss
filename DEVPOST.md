@@ -1,6 +1,8 @@
 # Devpost submission: Cuss (Cal Hacks 13.0)
 
 Copy each section into the matching Devpost field. Replace the `[brackets]` with true details from your own experience.
+**Submitter:** Belal Elboheisy
+
 **Deadline: Sunday 9:00 AM.** Submit a draft Saturday night, then keep editing. Add every teammate on Devpost.
 
 ## Prize tracks to select
@@ -22,7 +24,7 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 
 ## Claude for Public Benefit: how Cuss meets each criterion
 1. **Named community:** first-generation, working, commuting and transfer students at SF State: students who often don't have family who've been through college to explain how it works, who squeeze classes between jobs and long commutes, or who just transferred in and are learning a new campus's Canvas setup mid-degree. They have the least time to dig through five differently organized courses, and the most to lose from one missed deadline.
-2. **A real problem we've lived:** [Your story, one or two sentences: what you missed in Canvas, or the professor email you put off.] [Optional: "We also talked to N classmates who…" only if you actually did.]
+2. **A real problem we've lived:** Every semester I juggle multiple courses, each organized differently in Canvas, and a missed deadline or professor email can easily get buried. Cuss turns that fragmented information into one place that is easier to act on.
 3. **A working, high-impact product, and how we measure impact:** Cuss is fully working: real Canvas OAuth2 sign-in, a Claude agent with live Canvas tools, inbox, reminders, study tools and voice. Impact is measured inside the product (live at `/impact`, anonymous):
    - **Missing assignments over time**, snapshotted daily from Canvas for each student; the goal is for it to drop after joining.
    - **Deadline reminders delivered** before due dates, and on-time submission afterwards.
@@ -32,9 +34,9 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 4. **Thoughtful use of Claude:** Claude runs the product. It's an agent that decides which Canvas data to fetch, reads course PDFs natively, writes emails in the student's voice, and builds quizzes from the student's own notes, with every step shown. Claude also built it: Cuss was developed with **Claude Code** during the hackathon. See "Where Claude could go wrong" below for the risks we designed around.
 
 ## Links
-- **Try it:** [your Render link, e.g. https://cuss.onrender.com] (click "Try the live demo", no account needed)
+- **Try it:** **Pending Render deployment** (click "Try the student demo" after deployment; no account needed)
 - **Code:** https://github.com/BelalM4/cuss
-- **Impact dashboard:** [your Render link]/impact
+- **Impact dashboard:** **Pending Render deployment** (`<your Render URL>/impact`)
 - **Demo video:** [YouTube link]
 
 ## Built with (tags)
