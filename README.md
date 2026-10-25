@@ -85,7 +85,7 @@ This repo includes a `render.yaml`, so you can host the demo free on [Render](ht
 1. Sign up at render.com with your GitHub account.
 2. Click **New + → Blueprint**, pick this repo, and click **Apply**.
 3. When asked, paste your `ANTHROPIC_API_KEY`. Everything else is preset: demo mode, a fast AI setting, and daily message caps (40 per visitor, 400 total) to protect your bill.
-4. Your link appears at the top (like `https://cuss.onrender.com`). Open **`/share`** on it for a big QR code to show on screen.
+4. Your link appears at the top (ours is <https://cuss.onrender.com>). Open **`/share`** on it for a big QR code that sends judges straight to the demo.
 
 The free plan sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute. Open the link a few minutes before judging (or upgrade to the $7 plan for the day).
 
@@ -95,13 +95,6 @@ Running it on your laptop lets you use it yourself. For other students, it needs
 - Give the app a **persistent disk** for the `data/` folder (or set `DATA_DIR` to one). That's where logins, chats and memory are saved.
 - Ask the Canvas admins to add `https://your-app-address/auth/callback` as a redirect URI on the Developer Key.
 - Expect your school to ask about student-data privacy (FERPA). `ADMIN-REQUEST.md` explains how data is handled.
-
-#### Fast hackathon deployment on Render
-
-1. Create a new **Web Service** from this repository.
-2. Render can use the included `render.yaml`; otherwise use `npm ci` as the build command and `npm start` as the start command.
-3. Set `PUBLIC_URL` to the exact Render URL, `ANTHROPIC_API_KEY` to the server's key, and `DATA_DIR` to a persistent disk path if you need logins to survive deploys.
-4. Open `https://your-app-address/share` to show the judge QR code. It points to the login page, where judges can choose **Try the demo** without a Canvas account.
 
 The included `manifest.webmanifest`, `sw.js`, and `logo.svg` make the judge experience installable as a PWA on supported browsers. A native iOS/Android wrapper can use the same hosted URL after the hackathon; store submission still requires platform accounts, signing, privacy disclosures, and review.
 
@@ -141,7 +134,7 @@ Things to try:
 - Each student's data is isolated; cross-site requests are blocked; per-student and overall daily AI caps.
 - **Log out of all devices** and **Delete my data & disconnect** in Settings.
 - Accessibility: labeled controls, visible keyboard focus, a skip link, screen-reader announcements for new messages, and reduced-motion support.
-- **Tests:** `npm test` runs 19 automated tests (OAuth sign-in, data isolation, email/reply drafts, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
+- **Tests:** `npm test` runs 21 automated tests (OAuth sign-in, data isolation, email/reply drafts, professor mode, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
 
 ## How it works
 - `server.js`: web server, login routes, API.
@@ -151,8 +144,10 @@ Things to try:
 - `lib/agent.js`: the AI assistant (Claude) and its tools.
 - `lib/chats.js`: saved chats, email drafts, long-term memory.
 - `lib/reminders.js`: background reminders, announcements, independent-mode briefings, calendar feed.
-- `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes).
+- `lib/demo-canvas.js`: "Demo University", a mock Canvas (student and professor) that speaks the real Canvas API.
+- `lib/files.js`: reads PDFs, PowerPoint and Word files for Claude.
+- `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes, professor dashboard).
 
 Built at Cal Hacks 13.0. Install it on a phone by opening the link and tapping **Add to Home Screen**. For App Store and Google Play builds, see **`mobile/STORE-GUIDE.md`**.
 
-Presenting Cuss? See **`DEMO-SCRIPT.md`** for a 3-minute walkthrough and a pre-demo checklist.
+Presenting Cuss? See **`DEMO-SCRIPT.md`** for the 2-minute table pitch, judge Q&A, and a pre-demo checklist.
