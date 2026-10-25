@@ -32,9 +32,9 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 4. **Thoughtful use of Claude:** Claude runs the product. It's an agent that decides which Canvas data to fetch, reads course PDFs natively, writes emails in the student's voice, and builds quizzes from the student's own notes, with every step shown. Claude also built it: Cuss was developed with **Claude Code** during the hackathon. See "Where Claude could go wrong" below for the risks we designed around.
 
 ## Links
-- **Try it:** https://cuss.onrender.com (click "Try the student demo" or "Professor demo", no account needed)
+- **Try it:** [your Render link] (click "Try the student demo" or "Professor demo", no account needed)
 - **Code:** https://github.com/BelalM4/cuss
-- **Impact dashboard:** https://cuss.onrender.com/impact
+- **Impact dashboard:** [your Render link]/impact
 - **Demo video:** [YouTube link]
 
 ## Built with (tags)
