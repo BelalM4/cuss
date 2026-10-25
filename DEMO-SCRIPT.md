@@ -56,7 +56,7 @@ Judges look for: (1) a **named community**: for this track say: "Cuss is for eve
 ### Know where Claude can go wrong
 Judges will ask. Have these answers ready:
 - **Wrong or made-up deadlines:** Cuss is instructed to fetch Canvas data and shows its tool steps. The model can still miss a change or misinterpret a date, so students should verify important deadlines in Canvas and announcements.
-- **Sending the wrong email to a professor:** every email and reply is a draft the student must approve. Auto-send is an opt-in with a warning.
+- **Sending the wrong email to a professor:** drafts by default. Sending right away needs both the auto-send opt-in and an explicit request to send.
 - **Academic dishonesty:** the system prompt tells Claude not to write graded work or answer live quizzes; it teaches, quizzes and plans instead.
 - **Privacy:** Claude only sees what the student already sees in Canvas. Students can delete their data and revoke access anytime.
 - **Running autonomously:** independent mode can read and draft, but never sends messages on its own.

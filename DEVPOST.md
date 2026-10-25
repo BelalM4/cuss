@@ -67,8 +67,8 @@ Built for academic integrity: Cuss helps students learn and plan. It won't do gr
 It also installs like an app: on iPhone or Android, open the link and tap **Add to Home Screen**.
 
 ## Where Claude could go wrong (and what we did about it)
-- **Hallucinated deadlines or facts:** Cuss is told never to answer from memory. It must call Canvas tools, and every tool call is shown to the student, so they can see where each answer came from.
-- **A wrong email to a professor:** every email and reply is a draft until the student presses Send. Auto-send is an opt-in with a warning, and the daily "independent mode" can draft but never send.
+- **Hallucinated deadlines or facts:** Cuss is instructed to fetch course information with Canvas tools, and every tool call is shown to the student, so they can see where an answer came from. Important dates should still be checked against Canvas and announcements.
+- **A wrong email to a professor:** emails and replies are drafts by default. Sending right away needs both the auto-send opt-in and an explicit request to send, and the daily "independent mode" can draft but never send. A draft is delivered only once, even if Send is pressed repeatedly.
 - **Academic integrity:** Claude is instructed not to write graded work or answer live quizzes and exams; it explains, quizzes and plans instead.
 - **Privacy:** Claude sees only what the student can already see in Canvas, and students can delete their data and revoke access at any time.
 - **Cost and abuse:** per-student and global daily message caps.
@@ -88,7 +88,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 ## Challenges we ran into
 - **Schools lock down Canvas access.** Our own school disables personal API tokens, so we built proper OAuth2 sign-in, plus a full mock Canvas, so the product works end to end before official approval.
 - **Making an agent feel fast.** Multi-step tool use can feel slow, so we stream text and show each tool step live, run independent tools in parallel, and tune the model's effort for voice versus typed questions.
-- **Safety with real email.** An AI that can message professors needs guardrails: every email and reply is a draft until the student approves it, and auto-send is a clearly labeled opt-in.
+- **Safety with real email.** An AI that can message professors needs guardrails: messages are drafts by default, and sending right away needs both a clearly labeled auto-send opt-in and an explicit request.
 - **Saving conversations correctly.** Persisting the full agent history (tool calls, results and UI cards) so chats can be reopened and continued, without the steps getting out of order.
 - **Voice in the browser.** Handling speech recognition and speech synthesis quirks across browsers (missing end events, long-utterance cutoffs).
 
@@ -106,7 +106,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 
 ## What's next for Cuss
 - **Official approval at San Francisco State University** (I'm requesting a Canvas developer key), then a pilot with students.
-- App Store and Google Play release with native push notifications (the Capacitor project is ready).
+- App Store and Google Play release with native push notifications (a Capacitor wrapper scaffold is prepared; device testing and store submission are next).
 - **Cuss for Professors** (already working in the demo): instructors see who's falling behind and what needs grading, answer student messages, nudge students with missing work, and post announcements. It's the other half of the loop: the same students we serve get reached sooner by their professors.
 - Google Calendar and school email (Gmail/Outlook) integration.
 - Study groups: shared flashcard decks and quiz battles for the same course.
