@@ -1350,10 +1350,11 @@ function autosize() {
 function syncPanelAccessibility() {
   const mobile = matchMedia("(max-width:760px)").matches;
   const history = mobile && $("#sidebar").classList.contains("open");
-  const today = matchMedia("(max-width:1180px)").matches && $("#today").classList.contains("open");
+  const narrow = matchMedia("(max-width:1180px)").matches;
+  const today = narrow && $("#today").classList.contains("open");
   $(".chat").inert = history || today;
   $("#sidebar").inert = mobile && today;
-  $("#today").inert = history;
+  $("#today").inert = history || (!narrow && $(".app").classList.contains("today-collapsed"));
   $("#menuBtn").setAttribute("aria-expanded", String(history));
   $("#todayBtn").setAttribute("aria-expanded", String(today));
 }
@@ -1438,6 +1439,21 @@ $("#todayBtn").addEventListener("click", () => {
   $("#scrim").classList.add("show");
 });
 $("#scrim").addEventListener("click", closePanels);
+
+// Wide screens: show or hide the Today panel (remembered on this device).
+function setTodayCollapsed(collapsed) {
+  $(".app").classList.toggle("today-collapsed", collapsed);
+  const btn = $("#panelToggle");
+  const label = collapsed ? "Show the Today panel" : "Hide the Today panel";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  btn.setAttribute("aria-expanded", String(!collapsed));
+  btn.classList.toggle("on", !collapsed);
+  store.set("todayCollapsed", collapsed);
+  syncPanelAccessibility();
+}
+$("#panelToggle").addEventListener("click", () => setTodayCollapsed(!$(".app").classList.contains("today-collapsed")));
+setTodayCollapsed(store.get("todayCollapsed", false));
 document.querySelectorAll(".suggestion").forEach((s) => s.addEventListener("click", () => send(s.dataset.prompt)));
 document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") e.preventDefault(), dictate();
