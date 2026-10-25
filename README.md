@@ -7,7 +7,7 @@ An AI assistant for Canvas, powered by Claude, for every student and teacher.</p
 
 <p align="center">
   <a href="https://cuss.onrender.com"><b>Try the live demo →</b></a> &nbsp;·&nbsp;
-  <a href="https://youtu.be/iZonoqqxo8Q">Watch the 2-minute demo</a> &nbsp;·&nbsp;
+  <a href="https://youtu.be/iZonoqqxo8Q">Watch the demo video</a> &nbsp;·&nbsp;
   <a href="https://cuss.onrender.com/impact">Impact dashboard</a> &nbsp;·&nbsp;
   <a href="DEVPOST.md">Devpost write-up</a>
 </p>
