@@ -52,6 +52,8 @@ test("upload a file, write a note, and set class days", async () => {
 
   const lib = await c.json("/api/library/101");
   assert.equal(lib.items.length, 2);
+  // Demo classes come with their meeting days.
+  assert.deepEqual((await c.json("/api/library/102")).classDays, [2, 4]);
 });
 
 test("a reading due next class, with a reminder, shows up everywhere", async () => {
@@ -79,6 +81,7 @@ test("a reading due next class, with a reminder, shows up everywhere", async () 
   assert.equal((await c.json("/api/library/upcoming")).length, 0);
 
   // "Next class" needs class days.
+  await c.json("/api/library/103/days", { method: "PUT", json: { days: [] } });
   const bad = await c.request("/api/library/103/tasks", { method: "POST", json: { title: "Essay outline", readBy: "next_class" } });
   assert.equal(bad.status, 400);
   assert.match((await bad.json()).error, /days this class meets/);
