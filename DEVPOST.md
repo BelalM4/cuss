@@ -15,13 +15,13 @@ Copy each section into the matching Devpost field. Replace the `[brackets]` with
 Cuss
 
 ## Tagline (short description)
-Your semester, handled: an AI assistant for SF State students that reads your Canvas, tracks every deadline, handles your professor emails and inbox, and quizzes you on your actual course notes, by voice or text.
+Your semester, handled: an AI assistant for first-gen, working, commuting and transfer students at SF State that reads your Canvas, tracks every deadline, handles your professor emails and inbox, and quizzes you on your actual course notes, by voice or text.
 
 ## Thumbnail / gallery
 Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your own live run**: the Today panel, the live step bubbles, a quiz, the email card and voice mode.
 
 ## Claude for Public Benefit: how Cuss meets each criterion
-1. **Named community:** [Pick the one that is TRUE for you: "first-generation SF State students" / "SF State students who work and commute" / "SF State transfer students"]. Not just "students": people who juggle Canvas across several courses without much time or a support network to fall back on.
+1. **Named community:** first-generation, working, commuting and transfer students at SF State: students who often don't have family who've been through college to explain how it works, who squeeze classes between jobs and long commutes, or who just transferred in and are learning a new campus's Canvas setup mid-degree. They have the least time to dig through five differently organized courses, and the most to lose from one missed deadline.
 2. **A real problem we've lived:** [Your story, one or two sentences: what you missed in Canvas, or the professor email you put off.] [Optional: "We also talked to N classmates who…" only if you actually did.]
 3. **A working, high-impact product, and how we measure impact:** Cuss is fully working: real Canvas OAuth2 sign-in, a Claude agent with live Canvas tools, inbox, reminders, study tools and voice. Impact is measured inside the product (live at `/impact`, anonymous):
    - **Missing assignments over time**, snapshotted daily from Canvas for each student; the goal is for it to drop after joining.
@@ -43,7 +43,7 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 ---
 
 ## Inspiration
-**Who it's for:** SF State students: many of us commute, work jobs, and juggle four or five Canvas courses that are each organized differently. [Add one true sentence about your own experience, e.g. a missed quiz or a professor email you put off for a week.]
+**Who it's for:** first-generation, working, commuting and transfer students at SF State. We juggle jobs, commutes and four or five Canvas courses that are each organized differently, often without anyone at home who's done college before. [Add one true sentence about your own experience, e.g. a missed quiz or a professor email you put off for a week.]
 
 Every student we know has missed something that was sitting in Canvas the whole time: a deadline buried in a module, an announcement that moved a quiz, a professor's message offering a second chance. Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Meanwhile, students juggle five courses, each organized differently, and writing a "professional" email to a professor can feel harder than the assignment itself.
 

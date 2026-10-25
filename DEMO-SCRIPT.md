@@ -16,7 +16,7 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 ## The 2-minute pitch
 
 **0:00 – The problem (15 s)**
-> "I'm Belal, an SF State student. Every semester I juggle five Canvas courses, and every one is set up differently. Last month I missed [a real example: a quiz, an announcement, a professor's email] that was sitting in Canvas the whole time. Canvas has everything, but it's a filing cabinet, not an assistant."
+> "I'm Belal. I built Cuss for first-gen, working, commuting and transfer students at SF State, people like me with the least time to dig through Canvas. Every semester I juggle five courses, and every one is set up differently. Last month I missed [a real example: a quiz, an announcement, a professor's email] that was sitting in Canvas the whole time. Canvas has everything, but it's a filing cabinet, not an assistant."
 
 **0:15 – What Cuss is (10 s)**
 > "Cuss is an AI assistant that signs in to your Canvas and handles your semester. Here it is, live."
@@ -49,7 +49,7 @@ Hand over the QR code.
 ---
 
 ## For the Anthropic "Claude for Public Benefit" track
-Judges look for: (1) a **named community**: say it exactly, e.g. "first-gen SF State students"; (2) a **real problem you've lived**: tell your story; (3) a **working product and how you measure impact**: show `/impact`; (4) **thoughtful use of Claude**: the live steps, plus the fact that it was built with Claude Code.
+Judges look for: (1) a **named community**: say it exactly: "first-gen, working, commuting and transfer students at SF State"; (2) a **real problem you've lived**: tell your story; (3) a **working product and how you measure impact**: show `/impact`; (4) **thoughtful use of Claude**: the live steps, plus the fact that it was built with Claude Code.
 
 ### Know where Claude can go wrong
 Judges will ask. Have these answers ready:
