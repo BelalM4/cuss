@@ -23,8 +23,9 @@ import {
 import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
 import * as library from "./lib/library.js";
 import { listUserIds } from "./lib/store.js";
-
 import { reserveAiUsage } from "./lib/usage.js";
+import { closeDb, initDb } from "./lib/db.js";
+import { DATA_DIR } from "./lib/store.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -490,7 +491,11 @@ const PORT = Number(process.env.PORT) || 3000;
 // Only this computer can reach the app by default. When hosting it for other
 // students, set HOST=0.0.0.0 (most hosting services do this for you).
 const HOST = process.env.HOST || "127.0.0.1";
-app.listen(PORT, HOST, () => {
+const db = await initDb(DATA_DIR);
+if (db.enabled) console.log(`  Database: restored ${db.restored} files`);
+else console.log("  Database: off (no DATABASE_URL)");
+
+const server = app.listen(PORT, HOST, () => {
   const s = serverConfig();
   console.log(`\n  Cuss for Canvas is running → ${s.publicUrl}`);
   if (!s.canvasUrl) console.log(s.demo ? "  ⓘ No CANVAS_URL set: running with the demo school only" : "  ⚠  Set CANVAS_URL in .env (e.g. https://sfsu.instructure.com)");
@@ -499,3 +504,15 @@ app.listen(PORT, HOST, () => {
   console.log("");
   startReminderLoop();
 });
+
+let shuttingDown = false;
+const timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function shutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  server.close();
+  await Promise.race([closeDb(), timeout(8000)]);
+  process.exit(0);
+}
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

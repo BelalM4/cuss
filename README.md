@@ -94,10 +94,19 @@ This repo includes a `render.yaml`, so you can host the demo free on [Render](ht
 
 The free plan sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute. Open the link a few minutes before judging (or upgrade to the $7 plan for the day).
 
+### Saving data on Render
+
+Render's free filesystem is temporary. To keep logins, chats, memories,
+library files and other Cuss data across restarts, create a free
+[Neon Postgres](https://neon.tech) database, copy its connection string, and
+add it to your Render service as the `DATABASE_URL` environment variable.
+Redeploy the service. Cuss keeps using its current JSON files locally and
+mirrors them to Postgres when this variable is set.
+
 ### 3. Share it with other students (hosting)
 Running it on your laptop lets you use it yourself. For other students, it needs to run on a server with a public `https://` address, for example Render, Railway or Fly.io:
 - Set the same values as your `.env` in the host's "environment variables" settings, plus `HOST=0.0.0.0` and `PUBLIC_URL=https://your-app-address`.
-- Give the app a **persistent disk** for the `data/` folder (or set `DATA_DIR` to one). That's where logins, chats and memory are saved.
+- Set `DATABASE_URL` to a managed Postgres connection string so Cuss mirrors the `data/` folder and restores it after restarts. A persistent disk is also supported, but is not required.
 - Ask the Canvas admins to add `https://your-app-address/auth/callback` as a redirect URI on the Developer Key.
 - Expect your school to ask about student-data privacy (FERPA). `ADMIN-REQUEST.md` explains how data is handled.
 
@@ -145,7 +154,7 @@ Things to try:
 - **Log out of all devices** and **Delete my data & disconnect** in Settings.
 - Calendar links use a long random private token and can be turned off and replaced from Settings.
 - Accessibility: labeled controls, visible keyboard focus, a skip link, screen-reader announcements for new messages, and reduced-motion support.
-- **Tests:** `npm test` runs 27 automated tests (OAuth sign-in, data isolation, email/reply drafts, professor mode, class library and calendar links, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
+- **Tests:** `npm test` runs the automated OAuth sign-in, data isolation, email/reply draft, professor mode, class library, file-reading, encryption, caps, session, and persistence checks. The Postgres persistence check runs when `TEST_DATABASE_URL` is set; all tests run on every push via GitHub Actions.
 
 ## How it works
 - `server.js`: web server, login routes, API.
