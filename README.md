@@ -3,7 +3,7 @@
 <h1 align="center">Cuss for Canvas</h1>
 
 <p align="center"><b>Your semester. Handled.</b><br>
-An AI assistant for Canvas, powered by Claude, for first-gen, working, commuting and transfer students at SF State.</p>
+An AI assistant for Canvas, powered by Claude. Built first for students with ADHD and other disabilities, and for every student and teacher.</p>
 
 <p align="center">
   <a href="https://cuss.onrender.com"><b>Try the live demo →</b></a> &nbsp;·&nbsp;
@@ -20,7 +20,7 @@ An AI assistant for Canvas, powered by Claude, for first-gen, working, commuting
 > **No account needed:** open the demo, click **Try the student demo** or **Professor demo**, and sign in to "Demo University", a practice Canvas with sample classes, deadlines, professors and course files. The AI is real.
 
 ## Why
-Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Deadlines hide in modules, announcements move quizzes, and a professor's message offering a second chance is easy to miss. Students with jobs, long commutes or no one at home who's been through college have the least time to dig through five differently organized courses. Cuss reads Canvas for them and acts on it.
+Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Deadlines hide in modules, announcements move quizzes, and a professor's message offering a second chance is easy to miss. For students with ADHD and other disabilities, keeping track of everything at once across fast-moving classes is often the hardest part. I built Cuss because I'm one of them: it keeps everything in one place, reminds you before things slip, and turns "what do I do next?" into a short list. It works for every student, and professors get their own version.
 
 ## Tech
 | Part | What it uses |
