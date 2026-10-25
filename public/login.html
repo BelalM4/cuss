@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Cuss · Your semester, handled</title>
-  <meta name="theme-color" content="#0b0b14" />
+  <title>Cuss · Your semester. Handled.</title>
+  <meta name="theme-color" content="#ffffff" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -18,43 +18,34 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="login-page">
-  <div class="landing">
-    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-
-    <section class="hero">
-      <span class="eyebrow"><i data-icon="sparkles" data-size="15"></i>AI assistant for Canvas</span>
-      <h1>Your semester,<br /><span class="grad-text">handled.</span></h1>
-      <p class="lead">Cuss connects to your Canvas, keeps track of every deadline, writes emails to your professors, and turns your course notes into quizzes. Just talk to it.</p>
-      <div class="features">
-        <div class="feature"><div class="fi"><i data-icon="clock"></i></div><div><b>Never miss a deadline</b><span>Smart reminders days and hours before due dates</span></div></div>
-        <div class="feature"><div class="fi"><i data-icon="mail"></i></div><div><b>Emails to professors</b><span>Polite, specific, sent through Canvas Inbox</span></div></div>
-        <div class="feature"><div class="fi"><i data-icon="layers"></i></div><div><b>Study from your notes</b><span>Flashcards &amp; quizzes from your actual course pages</span></div></div>
-        <div class="feature"><div class="fi"><i data-icon="wave"></i></div><div><b>Hands-free voice</b><span>Talk to it like a friend who read the syllabus</span></div></div>
+<body class="site">
+  <nav class="gnav" aria-label="Cuss">
+    <div class="gnav-in">
+      <a class="gbrand" href="/"><img src="/logo.svg" alt="" width="22" height="22" />Cuss</a>
+      <div class="glinks">
+        <a href="#students">Students</a>
+        <a href="#professors">Professors</a>
+        <a href="/impact">Impact</a>
+        <a href="/privacy.html">Privacy</a>
       </div>
-    </section>
+      <a class="gsign" href="#signin">Sign in</a>
+    </div>
+  </nav>
 
-    <main class="login-card">
-      <img class="logo-img big" src="/logo.svg" alt="Cuss" />
-      <h2>Welcome to Cuss</h2>
-      <p class="tagline">Sign in with your school's Canvas to get started.</p>
+  <main>
+    <section class="hero" id="signin">
+      <img class="hero-icon" src="/logo.svg" alt="Cuss app icon" width="96" height="96" />
+      <p class="eyebrow-apple">Cuss for Canvas</p>
+      <h1>Your semester.<br /><span class="grad-text">Handled.</span></h1>
+      <p class="sub">The AI assistant that reads your Canvas, keeps track of every deadline, writes to your professors, and quizzes you on your real course notes.</p>
 
-      <a class="sso-btn hidden" id="ssoBtn" href="/auth/login">
-        <i data-icon="logout"></i><span id="ssoLabel">Log in with Canvas</span>
-      </a>
-
-      <a class="demo-btn hidden" id="demoBtn" href="/auth/demo">
-        <span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
-        <span><b>Try the live demo</b><span>Sample student at “Demo University”. No account needed.</span></span>
-      </a>
-      <a class="demo-btn hidden" id="profDemoBtn" href="/auth/demo?role=professor">
-        <span class="play">✦</span>
-        <span><b>Try the professor demo</b><span>Dr. Maya Chen at Demo University. No account needed.</span></span>
-      </a>
-
-      <div class="notice hidden" id="notReady"></div>
+      <div class="ctas">
+        <a class="pill hidden" id="ssoBtn" href="/auth/login"><span id="ssoLabel">Log in with Canvas</span></a>
+        <a class="pill hidden" id="demoBtn" href="/auth/demo">Try the student demo</a>
+        <a class="textlink hidden" id="profDemoBtn" href="/auth/demo?role=professor">Professor demo ›</a>
+      </div>
       <p class="form-error hidden" id="error"></p>
-
+      <div class="notice hidden" id="notReady"></div>
       <details class="token-login hidden" id="tokenBox">
         <summary>Use a Canvas access token instead</summary>
         <form id="tokenForm">
@@ -64,9 +55,58 @@
         </form>
       </details>
 
-      <p class="login-foot">You sign in on your school's own login page. Cuss never sees your password. · <a href="/privacy.html">Privacy</a></p>
-    </main>
-  </div>
+      <div class="hero-shot"><img src="/img/app-light.png" alt="The Cuss app: suggestions in the middle and a Today panel with deadlines, messages and grades" /></div>
+    </section>
+
+    <section class="tiles-wrap" id="students">
+      <h2 class="section-title">Everything Canvas knows.<br />Finally on your side.</h2>
+      <div class="tiles">
+        <div class="tile wide">
+          <i data-icon="clock" data-size="34"></i>
+          <h3>Never miss a deadline.</h3>
+          <p>Every due date across every course in one Today view, with reminders days and hours before anything is due.</p>
+        </div>
+        <div class="tile">
+          <i data-icon="message" data-size="34"></i>
+          <h3>Your inbox, handled.</h3>
+          <p>Summaries of professors’ messages, reply drafts, and an alert the moment they write back.</p>
+        </div>
+        <div class="tile">
+          <i data-icon="layers" data-size="34"></i>
+          <h3>Study from your real notes.</h3>
+          <p>Quizzes and flashcards from your lecture PDFs, PowerPoints and Word docs.</p>
+        </div>
+        <div class="tile dark">
+          <div class="orb tile-orb"><span></span></div>
+          <h3>Just ask.</h3>
+          <p>Talk to Cuss hands-free. “What should I work on tonight?”</p>
+        </div>
+        <div class="tile">
+          <i data-icon="mail" data-size="34"></i>
+          <h3>Emails you’ll actually send.</h3>
+          <p>Polite, specific messages to the right professor. Nothing sends until you say so.</p>
+        </div>
+        <div class="tile full">
+          <i data-icon="check" data-size="34"></i>
+          <h3>Private by design.</h3>
+          <p>You sign in on your school’s own page. Tokens are encrypted, and you can delete everything anytime.</p>
+        </div>
+      </div>
+      <p class="for-who">Built for first-gen, working, commuting and transfer students at SF State, and anyone juggling too many Canvas courses.</p>
+    </section>
+
+    <section class="profs" id="professors">
+      <p class="eyebrow-apple">Cuss for Professors</p>
+      <h2>Reach struggling students sooner.</h2>
+      <p>See who’s falling behind and what needs grading, answer student messages, and post announcements, all with the same Canvas sign-in.</p>
+      <a class="textlink light" href="/auth/demo?role=professor">Try the professor demo ›</a>
+    </section>
+  </main>
+
+  <footer class="gfoot">
+    <p>Built at Cal Hacks 13.0 with Claude. · <a href="/privacy.html">Privacy</a> · <a href="/impact">Impact</a> · <a href="https://github.com/BelalM4/cuss">GitHub</a></p>
+    <p>You sign in on your school’s own login page. Cuss never sees your password.</p>
+  </footer>
 
   <script src="icons.js"></script>
   <script type="module">
@@ -89,12 +129,12 @@
     if (info.demo) {
       $("#demoBtn").classList.remove("hidden");
       $("#profDemoBtn").classList.remove("hidden");
-      // With no school login yet, the demo is the main way in.
-      if (!info.sso) $("#demoBtn").classList.add("primary");
+      // With a school login available, the demo becomes the secondary option.
+      if (info.sso) $("#demoBtn").classList.add("secondary");
     }
     if (!info.sso) {
       $("#notReady").innerHTML =
-        "<b>School login coming soon.</b> Canvas sign-in turns on once the school approves Cuss (see <code>ADMIN-REQUEST.md</code>).";
+        "School sign-in is coming soon. It turns on once the school approves Cuss.";
       $("#notReady").classList.remove("hidden");
     }
     if (info.tokenLogin) {
