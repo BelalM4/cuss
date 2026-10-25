@@ -1,6 +1,48 @@
-# Cuss for Canvas 🎓
+<p align="center"><img src="public/icons/logo-512.png" width="120" alt="Cuss app icon"></p>
 
-A personal AI assistant for school. Students click **"Log in with SFSU Canvas"**, sign in on the usual school login page, and Cuss:
+<h1 align="center">Cuss for Canvas</h1>
+
+<p align="center"><b>Your semester. Handled.</b><br>
+An AI assistant for Canvas, powered by Claude, for first-gen, working, commuting and transfer students at SF State.</p>
+
+<p align="center">
+  <a href="https://cuss.onrender.com"><b>Try the live demo →</b></a> &nbsp;·&nbsp;
+  <a href="https://cuss.onrender.com/impact">Impact dashboard</a> &nbsp;·&nbsp;
+  <a href="DEVPOST.md">Devpost write-up</a>
+</p>
+
+<p align="center">
+  Built by Belal Elboheisy at <b>Cal Hacks 13.0</b> (solo) · Anthropic <i>Claude for Public Benefit</i> track
+</p>
+
+<p align="center"><img src="public/img/app-light.png" width="860" alt="The Cuss app: chat in the middle and a Today panel with deadlines, messages and grades"></p>
+
+> **No account needed:** open the demo, click **Try the student demo** or **Professor demo**, and sign in to "Demo University", a practice Canvas with sample classes, deadlines, professors and course files. The AI is real.
+
+## Why
+Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Deadlines hide in modules, announcements move quizzes, and a professor's message offering a second chance is easy to miss. Students with jobs, long commutes or no one at home who's been through college have the least time to dig through five differently organized courses. Cuss reads Canvas for them and acts on it.
+
+## Tech
+| Part | What it uses |
+|---|---|
+| AI agent | Claude (Anthropic API) with tool use: it decides which Canvas data to fetch, reads PDFs natively, and every step streams to the screen |
+| Canvas | Canvas REST API and official Canvas OAuth2 sign-in through the school's SSO |
+| Server | Node.js + Express, per-user storage, encrypted tokens, background reminders |
+| App | Vanilla JavaScript, HTML and CSS (no build step), installable PWA, Web Speech API for voice, Capacitor project for iOS and Android |
+| Quality | `node:test` suite and GitHub Actions; hosted on Render (`render.yaml`) |
+| Built with | Claude Code, during the hackathon |
+
+## Roadmap
+- SF State pilot once the Canvas developer key is approved
+- Move the frontend to React, and storage to a Postgres database
+- App Store and Google Play release with push notifications
+- Google Calendar and school email integration
+- Any Canvas school can turn on Cuss with one approval
+
+---
+
+## What it does
+Students click **"Log in with SFSU Canvas"**, sign in on the usual school login page, and Cuss:
 
 - **Reminds them about due dates.** It alerts them 3 days, 1 day and 3 hours before anything unsubmitted is due (adjustable) and when there's a new announcement. A one-click calendar export covers Google, Apple and Outlook.
 - **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. You also get an alert when a professor writes back.
@@ -10,7 +52,7 @@ A personal AI assistant for school. Students click **"Log in with SFSU Canvas"**
 - **Can work independently.** In *Independent mode*, Cuss checks Canvas every morning by itself and writes a daily briefing and study plan.
 - **Talks.** Students can tap the 🎤 mic and speak, and turn on **Voice replies** for hands-free conversation.
 
-**Try it without a school account:** click **▶ Try the demo** on the login page. You sign in on a practice login page for "Demo University" and get a sample student with real-looking classes, deadlines, professors and course notes. The AI is real, so chatting, quizzes, flashcards and emails all work, but demo emails go nowhere. This is handy for showing Cuss to schools.
+**Try it without a school account:** click **Try the student demo** (or **Professor demo**) on the login page. You sign in on a practice login page for "Demo University" and get a sample student with real-looking classes, deadlines, professors and course notes. The AI is real, so chatting, quizzes, flashcards and emails all work, but demo emails go nowhere. This is handy for showing Cuss to schools.
 
 **Cuss for Professors.** When an instructor signs in, Cuss switches to professor mode automatically (Canvas tells it who teaches what): who's falling behind (missing work, low scores), what needs grading, summaries of and reply drafts for student messages, kind check-in messages to students with missing work, course announcements the professor reviews and posts, and practice quizzes built from their own lecture files. Student privacy comes first: grades are only ever shown to the professor, and nothing reaches students until the professor approves it. Try it with **Professor demo** on the login page.
 
