@@ -19,6 +19,12 @@ It can also draft a respectful email to the right instructor, create a practice 
 5. Ask: “Draft an email to Dr. Chen asking about the lab.”
 6. Show that the email is a draft and requires the student to press Send.
 
+## Optional professor answer
+
+If judges ask how Cuss could support instructors, switch to the professor demo:
+
+> "The same role-aware product also has Cuss for Professors: it shows class health, surfaces submitted work waiting for grading, and drafts announcements or kind student nudges. Those actions stay drafts until the professor approves them."
+
 ## Close
 
 Cuss is not another generic chatbot. It is a student-controlled layer on top of the LMS students already use. We built the demo around privacy, grounding, and safe actions—and the next step is making that experience native on iOS and Android for every campus.

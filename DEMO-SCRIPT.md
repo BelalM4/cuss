@@ -6,10 +6,11 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 - [ ] **Devpost submitted before 9:00 AM Sunday.** Submit a draft tonight and keep editing (see `DEVPOST.md`). Add your teammates.
 - [ ] Hosted link works (Render). Open it at **10:15 AM** so the free server is awake. **URL: pending deployment**
 - [ ] Laptop charged. Chrome open at the app, full screen (⌘ + Shift + F), zoomed in once (⌘ +).
-- [ ] Phone with the **QR code** (`your-link/share`) ready to hand to judges, or a second laptop tab with it.
+- [ ] Phone with the **QR code** (`<your Render URL>/share`) ready to hand to judges, or a second laptop tab with it.
 - [ ] **Settings → Start the demo over** right before each judge arrives, signed in as yourself.
 - [ ] Microphone already allowed (click the mic once beforehand).
 - [ ] Backup video of a perfect run on your phone, in case the venue Wi-Fi ("Cal Hacks 13.0") fails.
+- [ ] Optional professor answer ready: class health, grading queue, and approval-only announcements/nudges.
 
 ---
 

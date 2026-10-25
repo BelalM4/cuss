@@ -1,6 +1,6 @@
 # Devpost submission: Cuss (Cal Hacks 13.0)
 
-Copy each section into the matching Devpost field. Replace the `[brackets]` with true details from your own experience.
+Copy each section into the matching Devpost field. The only deployment-specific fields still pending are the live Render URL and backup video link.
 **Submitter:** Belal Elboheisy
 
 **Deadline: Sunday 9:00 AM.** Submit a draft Saturday night, then keep editing. Add every teammate on Devpost.
@@ -37,7 +37,7 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 - **Try it:** **Pending Render deployment** (click "Try the student demo" after deployment; no account needed)
 - **Code:** https://github.com/BelalM4/cuss
 - **Impact dashboard:** **Pending Render deployment** (`<your Render URL>/impact`)
-- **Demo video:** [YouTube link]
+- **Demo video:** **Pending backup recording**
 
 ## Built with (tags)
 `node.js` `express` `javascript` `html` `css` `canvas-lms` `canvas-api` `oauth2` `claude` `anthropic` `web-speech-api` `render`
@@ -45,7 +45,7 @@ Use `public/icons/logo-512.png` as the thumbnail. Add screenshots from **your ow
 ---
 
 ## Inspiration
-**Who it's for:** first-generation, working, commuting and transfer students at SF State. We juggle jobs, commutes and four or five Canvas courses that are each organized differently, often without anyone at home who's done college before. [Add one true sentence about your own experience, e.g. a missed quiz or a professor email you put off for a week.]
+**Who it's for:** first-generation, working, commuting and transfer students at SF State. We juggle jobs, commutes and four or five Canvas courses that are each organized differently, often without anyone at home who's done college before. I built Cuss around the everyday problem of deadlines, announcements, and professor messages getting buried across those courses.
 
 Every student we know has missed something that was sitting in Canvas the whole time: a deadline buried in a module, an announcement that moved a quiz, a professor's message offering a second chance. Canvas has everything a student needs, but it's a filing cabinet, not an assistant. Meanwhile, students juggle five courses, each organized differently, and writing a "professional" email to a professor can feel harder than the assignment itself.
 
@@ -106,7 +106,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 
 ## What's next for Cuss
 - **Cuss for Professors:** role-aware class health, grading queues, and approval-only announcement/student-nudge drafts are already available in the Demo University flow; the next step is piloting those workflows with instructors.
-- **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
+- **Official approval at San Francisco State University** and a pilot with students.
 - App Store and Google Play release with native push notifications (the Capacitor project is ready).
 - Google Calendar and school email (Gmail/Outlook) integration.
 - Study groups: shared flashcard decks and quiz battles for the same course.
@@ -115,4 +115,4 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 ---
 
 ## Demo video (optional but recommended)
-Record your 2-minute table pitch from `DEMO-SCRIPT.md` with ⌘ + Shift + 5, upload it to YouTube (Unlisted), and paste the link. It doubles as your backup if the Wi-Fi fails during judging.
+Record your 2-minute table pitch from `DEMO-SCRIPT.md` with ⌘ + Shift + 5, upload it to YouTube (Unlisted), and replace the pending video link above. It doubles as your backup if the Wi-Fi fails during judging.
