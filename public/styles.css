@@ -884,3 +884,9 @@ dialog.class-sheet { width: min(720px, calc(100vw - 24px)); }
 @media (max-width: 640px) {
   .class-sheet .dialog-head { top: calc(-16px - env(safe-area-inset-top)); margin: calc(-16px - env(safe-area-inset-top)) -16px 0; padding: calc(14px + env(safe-area-inset-top)) 16px 10px; }
 }
+.lib-card-title { font-weight: 600; font-size: 15px; margin: 6px 0 2px; }
+.lib-card-meta { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.lib-card .lib-line { margin-top: 8px; }
+.lib-card { padding-bottom: 14px; }
+.lib-card .lib-card-title, .lib-card .lib-card-meta, .lib-card .lib-line { padding-left: 18px; padding-right: 18px; }
+.lib-card .lib-card-title { margin-top: 12px; }

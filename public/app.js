@@ -512,7 +512,7 @@ function renderStepGroup(steps = []) {
 function addCard(card) {
   welcomeNode.classList.add("hidden");
   const node =
-    card.kind === "draft" || card.kind === "reply" || card.kind === "announcement" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : null;
+    card.kind === "draft" || card.kind === "reply" || card.kind === "announcement" ? draftCard(card) : card.kind === "flashcards" ? flashcardCard(card) : card.kind === "quiz" ? quizCard(card) : card.kind === "library" ? libraryCard(card) : null;
   if (node) $("#messages").append(node);
   scrollDown();
 }
@@ -1651,7 +1651,7 @@ function itemWhen(item) {
   return null;
 }
 
-async function addToCalendar(item) {
+async function addToCalendar(item, courseName = lib.course?.name || "") {
   if (!item.readBy && !item.remindAt) return toast("Pick a date first", "Set “Read by” or a reminder, then add it to your calendar.", { iconName: "calendar" });
   const native = nativeCal();
   if (native?.createEvent) {
@@ -1663,7 +1663,7 @@ async function addToCalendar(item) {
         startDate: start.getTime(),
         endDate: item.readBy ? start.getTime() + 864e5 : start.getTime() + 15 * 6e4,
         isAllDay: !!item.readBy,
-        notes: lib.course.name,
+        notes: courseName,
         alerts: item.readBy ? [-360] : [0],
       });
       return toast("Added to Calendar", item.title, { iconName: "calendar" });
@@ -1674,18 +1674,18 @@ async function addToCalendar(item) {
   location.href = `/api/library/item/${item.id}/ics`;
 }
 
-async function addToReminders(item) {
+async function addToReminders(item, courseName = lib.course?.name || "") {
   const when = itemWhen(item);
   const title = item.kind === "task" ? item.title : `Read: ${item.title}`;
   const native = nativeCal();
   if (native?.createReminder) {
     try {
       await native.requestFullRemindersAccess?.();
-      await native.createReminder({ title, notes: lib.course.name, dueDate: when?.getTime() });
+      await native.createReminder({ title, notes: courseName, dueDate: when?.getTime() });
       return toast("Added to Reminders", title, { iconName: "bell" });
     } catch {}
   }
-  const text = `${title} (${shortCourse(lib.course.name)})${when ? `, ${item.readBy ? `by ${dayLabel(item.readBy)}` : when.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : ""}`;
+  const text = `${title}${courseName ? ` (${shortCourse(courseName)})` : ""}${when ? `, ${item.readBy ? `by ${dayLabel(item.readBy)}` : when.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : ""}`;
   if (navigator.share) {
     try {
       await navigator.share({ title, text });
@@ -1698,11 +1698,33 @@ async function addToReminders(item) {
   toast("Copied", "Paste it into Reminders. In the iPhone app, Cuss adds it directly.", { iconName: "bell" });
 }
 
+// Chat card when Cuss adds a reading, to-do or notes to a class.
+function libraryCard({ courseId, courseName, item }) {
+  const due = item.readBy ? `Read by ${dayLabel(item.readBy)}` : "";
+  const remind = item.remindAt ? `🔔 ${new Date(item.remindAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}` : "";
+  const what = item.kind === "note" ? "Saved to" : "Added to";
+  return el(
+    "div",
+    { class: "card lib-card" },
+    cardHead(item.kind === "note" ? "note" : "list", `${what} ${shortCourse(courseName) || "your class"}`),
+    el("div", { class: "lib-card-title" }, item.title),
+    (due || remind) && el("div", { class: "lib-card-meta" }, [due, remind].filter(Boolean).join(" · ")),
+    el(
+      "div",
+      { class: "lib-line" },
+      (item.readBy || item.remindAt) && el("button", { type: "button", class: "chip", onclick: () => addToCalendar(item, courseName) }, iconEl("calendar", 14), "Add to Calendar"),
+      item.kind !== "note" && el("button", { type: "button", class: "chip", onclick: () => addToReminders(item, courseName) }, iconEl("bell", 14), "Add to Reminders"),
+      el("button", { type: "button", class: "chip accent", onclick: () => openClass(courseId, item.id) }, iconEl("folder", 14), "Open class"),
+    ),
+  );
+}
+
 // A private calendar link that keeps deadlines, readings and reminders in sync.
-$("#calSubscribeBtn").addEventListener("click", async () => {
+async function subscribeCalendar({ copyOnly = false, reset = false } = {}) {
   try {
-    const { https, webcal } = await api("/api/calendar-link", { method: "POST" });
-    if (isApple && !/localhost|127\.0\.0\.1/.test(https)) {
+    const { https, webcal } = await api("/api/calendar-link", { method: "POST", body: { reset } });
+    if (reset) return toast("Old calendar link turned off", "Tap Add to iPhone Calendar again to subscribe with the new one.", { iconName: "calendar" });
+    if (!copyOnly && isApple && !/localhost|127\.0\.0\.1/.test(https)) {
       location.href = webcal;
       toast("Opening Calendar", "Tap Subscribe. Deadlines, readings and reminders stay in sync.", { iconName: "calendar" });
     } else {
@@ -1712,4 +1734,8 @@ $("#calSubscribeBtn").addEventListener("click", async () => {
   } catch (err) {
     toast("Couldn't make a calendar link", err.message, { iconName: "alert" });
   }
-});
+}
+$("#calSubscribeBtn").addEventListener("click", () => subscribeCalendar());
+$("#calSubscribeBtn2").addEventListener("click", () => subscribeCalendar());
+$("#calCopyBtn").addEventListener("click", () => subscribeCalendar({ copyOnly: true }));
+$("#calResetBtn").addEventListener("click", () => confirm("Turn off your current calendar link? Calendars subscribed to it stop updating.") && subscribeCalendar({ reset: true }));

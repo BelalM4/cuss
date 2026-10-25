@@ -129,6 +129,10 @@ test("Cuss reads uploaded notes, adds readings due next class, and saves notes",
   await c.json("/api/library/102/days", { method: "PUT", json: { days: [0, 1, 2, 3, 4, 5, 6] } });
   r = await c.chat("chat-lib-2", "Chapter 4 reading is due next class, remind me");
   assert.ok(steps(r.events).some((s) => s.startsWith("“Read chapter 4” due")), steps(r.events).join(" | "));
+  const card = r.events.find((e) => e.type === "card")?.card;
+  assert.equal(card.kind, "library");
+  assert.equal(card.item.title, "Read chapter 4");
+  assert.match(card.courseName, /HIST/);
   const lib = await c.json("/api/library/102");
   const task = lib.items.find((i) => i.title === "Read chapter 4");
   assert.equal(task.readBy, lib.nextClass);
