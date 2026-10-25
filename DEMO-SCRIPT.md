@@ -34,8 +34,8 @@ Press **Send reply**.
 (The demo professor replies in about 15 seconds. Keep talking; the pop-up will land during the next step.)
 
 **1:15 – Study from real notes (20 s)**
-Type: **"Quiz me for Quiz 5"**.
-> "It opened my actual biology notes from Canvas, not the internet, and made a quiz from them."
+Type: **"Quiz me on the Lecture 15 slides for Quiz 5"**.
+> "It just opened my professor's actual PDF lecture slides from Canvas, diagrams and all, and made a quiz from them. It reads PowerPoints and Word docs too."
 Answer one question.
 
 **1:35 – Voice (15 s)**
