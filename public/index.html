@@ -19,9 +19,10 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#input">Skip to message box</a>
   <div class="app">
     <!-- Left: chats -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="Chats">
       <div class="brand">
         <img class="logo-img" src="/logo.svg" alt="Cuss" />
         <div class="brand-text">
@@ -38,7 +39,7 @@
           <div class="who-name" id="whoName">Student</div>
           <div class="who-sub" id="whoSub">Canvas</div>
         </div>
-        <button class="icon-btn ghost" id="settingsBtn" title="Settings"><i data-icon="settings"></i></button>
+        <button class="icon-btn ghost" id="settingsBtn" title="Settings" aria-label="Settings"><i data-icon="settings"></i></button>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
@@ -46,16 +47,16 @@
     <!-- Middle: conversation -->
     <main class="chat">
       <header class="chat-head">
-        <button class="icon-btn ghost only-mobile" id="menuBtn" title="Chats"><i data-icon="menu"></i></button>
+        <button class="icon-btn ghost only-mobile" id="menuBtn" title="Chats" aria-label="Chats"><i data-icon="menu"></i></button>
         <div class="chat-title" id="chatTitle">New chat</div>
         <div class="head-actions">
           <span class="demo-pill hidden" id="demoPill">DEMO</span>
-          <button class="toggle" id="speakToggle" aria-pressed="false" title="Read replies out loud"><i data-icon="volume"></i><span>Voice replies</span></button>
-          <button class="icon-btn ghost only-narrow" id="todayBtn" title="Today"><i data-icon="calendar"></i><span class="badge hidden" id="todayBadge"></span></button>
+          <button class="toggle" id="speakToggle" aria-pressed="false" title="Read replies out loud" aria-label="Read replies out loud"><i data-icon="volume"></i><span>Voice replies</span></button>
+          <button class="icon-btn ghost only-narrow" id="todayBtn" title="Today" aria-label="Today"><i data-icon="calendar"></i><span class="badge hidden" id="todayBadge"></span></button>
         </div>
       </header>
 
-      <div class="messages" id="messages">
+      <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Conversation">
         <section class="welcome" id="welcome">
           <div class="orb small-orb"><span></span></div>
           <h1 id="welcomeTitle">Hey there 👋</h1>
@@ -73,23 +74,23 @@
 
       <div class="composer-wrap">
         <form class="composer" id="composer">
-          <button type="button" class="comp-btn" id="micBtn" title="Dictate (⌘M)"><i data-icon="mic"></i></button>
-          <textarea id="input" rows="1" placeholder="Ask Cuss anything…"></textarea>
-          <button type="button" class="comp-btn voice-mode-btn" id="voiceModeBtn" title="Voice conversation"><i data-icon="wave"></i></button>
-          <button type="submit" class="send" id="sendBtn" title="Send"><i data-icon="up"></i></button>
+          <button type="button" class="comp-btn" id="micBtn" title="Dictate (⌘M)" aria-label="Dictate (⌘M)"><i data-icon="mic"></i></button>
+          <textarea id="input" rows="1" placeholder="Ask Cuss anything…" aria-label="Message Cuss"></textarea>
+          <button type="button" class="comp-btn voice-mode-btn" id="voiceModeBtn" title="Voice conversation" aria-label="Voice conversation"><i data-icon="wave"></i></button>
+          <button type="submit" class="send" id="sendBtn" title="Send" aria-label="Send"><i data-icon="up"></i></button>
         </form>
         <div class="composer-hint" id="voiceHint">Cuss reads your Canvas so you don't have to. <kbd>Enter</kbd> to send · <kbd>⌘M</kbd> to talk</div>
       </div>
     </main>
 
     <!-- Right: today -->
-    <aside class="today" id="today">
+    <aside class="today" id="today" aria-label="Today: deadlines, messages and grades">
       <div class="today-head">
         <div>
           <div class="today-title">Today</div>
           <div class="today-date" id="todayDate"></div>
         </div>
-        <button class="icon-btn ghost" id="refreshBtn" title="Refresh"><i data-icon="refresh"></i></button>
+        <button class="icon-btn ghost" id="refreshBtn" title="Refresh" aria-label="Refresh"><i data-icon="refresh"></i></button>
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-num" id="statDue">–</div><div class="stat-label">due this week</div></div>
@@ -126,8 +127,8 @@
   </nav>
 
   <!-- Full-screen voice conversation -->
-  <div class="voice-overlay hidden" id="voiceOverlay" aria-live="polite">
-    <button class="icon-btn ghost voice-close" id="voiceClose" title="End voice mode"><i data-icon="x"></i></button>
+  <div class="voice-overlay hidden" id="voiceOverlay" role="dialog" aria-modal="true" aria-label="Voice conversation" aria-live="polite">
+    <button class="icon-btn ghost voice-close" id="voiceClose" title="End voice mode" aria-label="End voice mode"><i data-icon="x"></i></button>
     <div class="orb big-orb" id="voiceOrb"><span></span></div>
     <div class="voice-state" id="voiceState">Listening…</div>
     <div class="voice-caption" id="voiceCaption">Ask about deadlines, studying, or your professors.</div>
@@ -138,17 +139,20 @@
   </div>
 
   <!-- Settings -->
-  <dialog id="settings">
+  <dialog id="settings" aria-label="Settings">
     <form method="dialog" id="settingsForm">
       <div class="dialog-head">
         <h2>Settings</h2>
-        <button type="button" class="icon-btn ghost" id="settingsCancel" title="Close"><i data-icon="x"></i></button>
+        <button type="button" class="icon-btn ghost" id="settingsCancel" title="Close" aria-label="Close"><i data-icon="x"></i></button>
       </div>
 
       <div class="account-row">
         <div class="avatar" id="avatar2">?</div>
         <span class="muted" id="accountLine">Logged in with Canvas</span>
         <button type="button" class="btn ghost small" id="logoutBtn"><i data-icon="logout"></i>Log out</button>
+      </div>
+      <div style="text-align:right;margin-top:6px">
+        <button type="button" class="link-btn small" id="logoutAllBtn">Log out of all devices</button>
       </div>
 
       <h3 class="settings-sub">Reminders</h3>

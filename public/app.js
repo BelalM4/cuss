@@ -288,6 +288,7 @@ async function loadChatList() {
         el("button", {
           class: "del",
           title: "Delete chat",
+          "aria-label": `Delete chat “${c.title}”`,
           html: icon("trash", 15),
           onclick: async (e) => {
             e.stopPropagation();
@@ -1072,6 +1073,12 @@ $("#memoryInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") e.preventDefault(), addMemory();
 });
 $("#settingsCancel").addEventListener("click", () => dialog.close());
+$("#logoutAllBtn").addEventListener("click", async () => {
+  if (!confirm("Log out of Cuss on every device (laptops and phones)?")) return;
+  await api("/auth/logout-all", { method: "POST" }).catch(() => {});
+  store.set("chatId", null);
+  location.replace("/login.html");
+});
 $("#logoutBtn").addEventListener("click", async () => {
   await api("/auth/logout", { method: "POST" }).catch(() => {});
   store.set("chatId", null);

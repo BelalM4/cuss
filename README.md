@@ -92,6 +92,13 @@ Things to try:
 - **"Canvas didn't allow that":** your professor may have restricted that page or file. If it happens everywhere, log out and back in.
 - **No reminders:** click *Enable reminders*, and keep the app running.
 
+## Security & quality
+- Canvas tokens are **encrypted at rest** (AES-256-GCM; key from `TOKEN_ENCRYPTION_KEY`, generated automatically on Render).
+- Each student's data is isolated; cross-site requests are blocked; per-student and overall daily AI caps.
+- **Log out of all devices** and **Delete my data & disconnect** in Settings.
+- Accessibility: labeled controls, visible keyboard focus, a skip link, screen-reader announcements for new messages, and reduced-motion support.
+- **Tests:** `npm test` runs 19 automated tests (OAuth sign-in, data isolation, email/reply drafts, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
+
 ## How it works
 - `server.js`: web server, login routes, API.
 - `lib/auth.js`: Canvas OAuth2 sign-in (school SSO), automatic token refresh, sessions.

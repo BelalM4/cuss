@@ -150,6 +150,12 @@ app.post("/auth/logout", (req, res) => {
   res.json({ ok: true });
 });
 
+// Signs this student out everywhere (every browser and phone).
+app.post("/auth/logout-all", (req, res) => {
+  auth.endSession(req, res, { allForUser: true });
+  res.json({ ok: true });
+});
+
 // Everything under /api needs a logged-in student.
 app.use(["/api", "/calendar.ics"], (req, res, next) => {
   if (!req.userId) return res.status(401).json({ error: "Please log in." });

@@ -23,5 +23,7 @@ services:
         value: "40"
       - key: DAILY_TOTAL_LIMIT
         value: "400"
+      - key: TOKEN_ENCRYPTION_KEY
+        generateValue: true
       - key: ALLOW_TOKEN_LOGIN
         value: "false"
