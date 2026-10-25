@@ -48,6 +48,8 @@ Students click **"Log in with SFSU Canvas"**, sign in on the usual school login 
 - **Reads and answers your Canvas Inbox.** "Any messages from my professors?" gets a summary, and Cuss drafts replies you send with one click. You also get an alert when a professor writes back.
 - **Writes emails to professors.** It finds the right instructor or TA, writes a polite message, and sends it through Canvas Inbox when the student presses **Send** (or says *"send it"*).
 - **Helps them study.** It reads their actual course pages, assignments, syllabus and **course files: PDFs (including diagrams and tables), PowerPoint slides with speaker notes, Word documents, images and text files**, explains topics, and makes **flashcards** and **practice quizzes**.
+- **Keeps every class organized.** Each class has its own **Files & notes**: Cuss brings in the class's Canvas files, students upload their own notes, slides or photos, write notes, and add readings or to-dos like *"chapter 4 is due next class"* (even when it isn't a Canvas assignment). Set the days a class meets and "next class" works everywhere, with reminders. Cuss reads all of it when you study, and can save notes it writes for you.
+- **Works with iPhone Calendar and Reminders.** One tap subscribes your iPhone Calendar to a private, auto-updating feed of deadlines, readings and reminders. Any item can go to Calendar or Reminders on its own (directly in the App Store app).
 - **Remembers them.** Saved chats appear in the sidebar, and long-term notes about the student (major, study style…) carry across chats.
 - **Can work independently.** In *Independent mode*, Cuss checks Canvas every morning by itself and writes a daily briefing and study plan.
 - **Talks.** Students can tap the 🎤 mic and speak, and turn on **Voice replies** for hands-free conversation.
@@ -134,7 +136,7 @@ Things to try:
 - Each student's data is isolated; cross-site requests are blocked; per-student and overall daily AI caps.
 - **Log out of all devices** and **Delete my data & disconnect** in Settings.
 - Accessibility: labeled controls, visible keyboard focus, a skip link, screen-reader announcements for new messages, and reduced-motion support.
-- **Tests:** `npm test` runs 21 automated tests (OAuth sign-in, data isolation, email/reply drafts, professor mode, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
+- **Tests:** `npm test` runs 27 automated tests (OAuth sign-in, data isolation, email/reply drafts, professor mode, class library and calendar links, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
 
 ## How it works
 - `server.js`: web server, login routes, API.
@@ -146,6 +148,7 @@ Things to try:
 - `lib/reminders.js`: background reminders, announcements, independent-mode briefings, calendar feed.
 - `lib/demo-canvas.js`: "Demo University", a mock Canvas (student and professor) that speaks the real Canvas API.
 - `lib/files.js`: reads PDFs, PowerPoint and Word files for Claude.
+- `lib/library.js`: each class's files, notes, readings, to-dos, "next class" dates and calendar events.
 - `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes, professor dashboard).
 
 Built at Cal Hacks 13.0. Install it on a phone by opening the link and tapping **Add to Home Screen**. For App Store and Google Play builds, see **`mobile/STORE-GUIDE.md`**.

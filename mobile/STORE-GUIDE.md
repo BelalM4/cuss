@@ -13,7 +13,7 @@ The `mobile/` folder is a [Capacitor](https://capacitorjs.com) project: native i
 Your privacy policy is already live at `https://YOUR-APP/privacy.html`.
 
 ## Steps
-1. In `mobile/capacitor.config.json`, replace `https://YOUR-CUSS-APP.onrender.com` with your real address.
+1. `mobile/capacitor.config.json` already points at `https://cuss.onrender.com`. Change it if your address is different.
 2. In Terminal:
    ```
    cd mobile
@@ -30,3 +30,11 @@ Your privacy policy is already live at `https://YOUR-APP/privacy.html`.
 - **School sign-in inside the app:** test your school's login in the app. If it refuses to load inside an app window, switch the login to open in the system browser with `@capacitor/browser`.
 - **Canvas approval:** real students can only sign in once the school has issued Cuss a developer key (see `ADMIN-REQUEST.md`). Until then, the store version can still offer the demo.
 - **Screenshots:** take them in the iOS Simulator (iPhone 6.7" and 6.5" sizes) and on an Android emulator.
+
+## iPhone Calendar and Reminders (native app)
+The web app already adds things to Apple Calendar (an event file, or the auto-updating subscription from **Add to my iPhone Calendar**) and to Reminders (through the share sheet). In the App Store build, Cuss adds events and reminders **directly**, using the `@ebarooni/capacitor-calendar` plugin (already in `package.json`). After `npm run ios`:
+1. In Xcode, open `App/App/Info.plist` and add these keys with a short explanation each:
+   - `NSCalendarsFullAccessUsageDescription`: "Cuss adds your readings and deadlines to your calendar."
+   - `NSRemindersFullAccessUsageDescription`: "Cuss adds your readings and to-dos to Reminders."
+2. Run on a real iPhone and test **Add to Calendar** and **Add to Reminders** on a class item. iOS asks for permission the first time.
+3. If the plugin's method names differ in the version you install, update `addToCalendar` and `addToReminders` in `public/app.js`; they fall back to the web behavior if the plugin call fails.

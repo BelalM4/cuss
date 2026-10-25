@@ -3,7 +3,7 @@
   "appName": "Cuss",
   "webDir": "www",
   "server": {
-    "url": "https://YOUR-CUSS-APP.onrender.com",
+    "url": "https://cuss.onrender.com",
     "cleartext": false
   },
   "backgroundColor": "#0b0b14"

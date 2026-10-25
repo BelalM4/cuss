@@ -24,6 +24,8 @@ import {
   writeAppJson,
 } from "./lib/store.js";
 import { startReminderLoop, notificationsSince, checkReminders, checkInbox, deadlinesIcs, runBriefing } from "./lib/reminders.js";
+import * as library from "./lib/library.js";
+import { listUserIds } from "./lib/store.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -156,6 +158,19 @@ app.post("/auth/logout-all", (req, res) => {
   auth.endSession(req, res, { allForUser: true });
   res.json({ ok: true });
 });
+
+// Calendar subscription for iPhone/Google/Outlook. Calendar apps can't send a
+// login cookie, so the address carries a private random token instead.
+app.get(
+  "/cal/:token.ics",
+  wrap(async (req, res) => {
+    const token = String(req.params.token);
+    const owner = /^[a-f0-9]{48}$/.test(token) && listUserIds().find((id) => runAsUser(id, () => getConfig().calendarToken === token));
+    if (!owner) return res.status(404).type("text/plain").send("This calendar link was turned off. Get a new one in Cuss.");
+    const ics = await runAsUser(owner, () => deadlinesIcs());
+    res.type("text/calendar").set("Cache-Control", "no-store").send(ics);
+  }),
+);
 
 // Everything under /api needs a logged-in student.
 app.use(["/api", "/calendar.ics"], (req, res, next) => {
@@ -293,6 +308,73 @@ app.get(
     res.send(await deadlinesIcs());
   }),
 );
+
+// --- Class library: files, notes and readings for each class ------------------
+
+const courseName = async (id) => (await canvas.listCourses().catch(() => [])).find((c) => c.id === Number(id))?.name || "";
+
+app.get("/api/library/upcoming", wrap((req, res) => res.json(library.upcomingReading())));
+app.get("/api/library/:courseId", wrap((req, res) => res.json(library.getClass(req.params.courseId))));
+app.put("/api/library/:courseId/days", wrap((req, res) => res.json(library.setClassDays(req.params.courseId, req.body?.days))));
+app.post("/api/library/:courseId/notes", wrap((req, res) => res.json(library.addNote(req.params.courseId, req.body || {}))));
+app.post("/api/library/:courseId/tasks", wrap((req, res) => res.json(library.addTask(req.params.courseId, req.body || {}))));
+app.post(
+  "/api/library/:courseId/import",
+  wrap(async (req, res) => res.json(await library.importCanvasFiles(req.params.courseId))),
+);
+app.post(
+  "/api/library/:courseId/upload",
+  express.raw({ type: () => true, limit: "20mb" }),
+  wrap((req, res) => {
+    let name = "file";
+    try {
+      name = decodeURIComponent(req.get("X-File-Name") || "file");
+    } catch {}
+    res.json(library.addUpload(req.params.courseId, { name, type: req.get("Content-Type"), buffer: req.body }));
+  }),
+);
+app.get("/api/library/item/:id", wrap((req, res) => res.json(library.getItem(req.params.id))));
+app.patch(
+  "/api/library/item/:id",
+  wrap(async (req, res) => {
+    const patch = { ...(req.body || {}) };
+    if (patch.remindAt) patch.courseName = await courseName(library.getItem(req.params.id).courseId);
+    res.json(library.updateItem(req.params.id, patch));
+  }),
+);
+app.delete(
+  "/api/library/item/:id",
+  wrap((req, res) => {
+    library.deleteItem(req.params.id);
+    res.json({ ok: true });
+  }),
+);
+app.get(
+  "/api/library/item/:id/file",
+  wrap((req, res) => {
+    const f = library.uploadedFile(req.params.id);
+  res.type(f.type || "application/octet-stream").set("Content-Disposition", `inline; filename="${encodeURIComponent(f.name)}"`).set("X-Content-Type-Options", "nosniff").set("Content-Security-Policy", "sandbox").send(f.buffer);
+  }),
+);
+app.get(
+  "/api/library/item/:id/ics",
+  wrap(async (req, res) => {
+    const item = library.getItem(req.params.id);
+    res.type("text/calendar").set("Content-Disposition", 'inline; filename="cuss.ics"').send(library.itemIcs(req.params.id, await courseName(item.courseId)));
+  }),
+);
+
+// A private, auto-updating calendar link (deadlines, readings and reminders).
+app.post("/api/calendar-link", (req, res) => {
+  let token = getConfig().calendarToken;
+  if (!token || req.body?.reset) {
+    token = crypto.randomBytes(24).toString("hex");
+    saveConfig({ calendarToken: token });
+  }
+  const base = (serverConfig().publicUrl || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
+  const https = `${base}/cal/${token}.ics`;
+  res.json({ https, webcal: https.replace(/^https?:/, "webcal:") });
+});
 
 app.get("/api/notifications", (req, res) => res.json(notificationsSince(req.query.since)));
 

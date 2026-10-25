@@ -56,6 +56,8 @@ Students sign in with their school's normal Canvas login, and Cuss takes it from
 - **Your inbox, handled.** Cuss reads your Canvas Inbox, summarizes what professors need from you, and drafts replies. You get an alert the moment a professor writes back.
 - **Emails to professors.** Ask "email my bio professor about office hours" and Cuss finds the right instructor and writes a polite, specific message. Nothing is sent until you press Send.
 - **Study from your real notes.** Cuss opens your actual course pages, syllabus and files (**PDF lecture slides with their diagrams, PowerPoint decks with speaker notes, Word documents and photos of notes**), explains the material, and builds interactive flashcards and practice quizzes from them, instead of from random internet content.
+- **Every class organized.** Each class has its own files and notes: Canvas files Cuss brings in, your own uploads and notes, and readings like "chapter 4 is due next class" even when they aren't Canvas assignments, with reminders. Cuss studies from all of it.
+- **iPhone Calendar and Reminders.** One tap adds an auto-updating calendar of deadlines, readings and reminders to your iPhone; any item can go to Calendar or Reminders.
 - **Talk to it.** A full-screen voice mode lets you have a hands-free conversation, like a friend who actually read the syllabus.
 - **It remembers you and can work on its own.** Chats are saved, Cuss keeps long-term notes (your major, how you like to study), and "independent mode" checks Canvas every morning to write your daily briefing and study plan.
 - **Live agent transparency.** As Cuss works, you see each step ("Checked deadlines ✓", "Read 'Week 8: Cell Membrane' ✓"), so students can trust where answers come from.

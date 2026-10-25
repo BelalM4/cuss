@@ -207,9 +207,11 @@ async function loadDashboard() {
   }
   loadInbox();
   loadImpact();
+  loadReadings();
   if (state.status?.role === "teacher") return loadTeacherDashboard();
   try {
     const courses = await api("/api/courses");
+    state.courses = courses;
     const scored = courses.filter((c) => c.currentScore != null);
     $("#statGrade").textContent = scored.length ? Math.round(scored.reduce((s, c) => s + c.currentScore, 0) / scored.length) + "%" : "–";
     $("#courseList").replaceChildren(
@@ -218,8 +220,8 @@ async function loadDashboard() {
         requestAnimationFrame(() => setTimeout(() => (bar.style.width = `${Math.min(100, c.currentScore ?? 0)}%`), 60));
         return el(
           "li",
-          { class: "course" },
-          el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, c.currentGrade || (c.currentScore != null ? `${c.currentScore}%` : ""))),
+          { class: "course clickable", tabindex: "0", role: "button", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id), onkeydown: (e) => e.key === "Enter" && openClass(c.id) },
+          el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, c.currentGrade || (c.currentScore != null ? `${c.currentScore}%` : ""), el("span", { class: "chev", html: icon("right", 14) }))),
           el("div", { class: "gbar" }, bar),
         );
       }),
@@ -231,6 +233,7 @@ async function loadDashboard() {
 async function loadTeacherDashboard() {
   try {
     const courses = await api("/api/teacher/overview");
+    state.courses = courses.map((c) => ({ id: c.id, name: c.name }));
     const sum = (f) => courses.reduce((n, c) => n + (f(c) || 0), 0);
     const needs = sum((c) => c.atRisk.length);
     const grading = sum((c) => c.needsGrading);
@@ -280,8 +283,8 @@ async function loadTeacherDashboard() {
         requestAnimationFrame(() => setTimeout(() => (bar.style.width = `${Math.min(100, avg ?? 0)}%`), 60));
         return el(
           "li",
-          { class: "course" },
-          el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, avg != null ? `avg ${avg}%` : "")),
+          { class: "course clickable", tabindex: "0", role: "button", "aria-label": `${c.name}: files and notes`, onclick: () => openClass(c.id), onkeydown: (e) => e.key === "Enter" && openClass(c.id) },
+          el("div", { class: "course-top" }, el("span", {}, c.name), el("span", { class: "g" }, avg != null ? `avg ${avg}%` : "", el("span", { class: "chev", html: icon("right", 14) }))),
           el("div", { class: "gbar" }, bar),
         );
       }),
@@ -1312,3 +1315,401 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").cat
   setInterval(loadDashboard, 10 * 60 * 1000);
   pollNotifications();
 })();
+
+// ---------------------------------------------------------------- class library
+// Each class gets its own files and notes: Canvas files Cuss brings in,
+// uploads, the student's notes and to-dos. Anything can be "due next class"
+// with a reminder, and go into the iPhone Calendar or Reminders app.
+
+const lib = { course: null, data: null, open: null, editing: null };
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+const DAY_SHORT = ["Su", "M", "Tu", "W", "Th", "F", "Sa"];
+const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+const nativeCal = () => window.Capacitor?.Plugins?.CapacitorCalendar;
+
+const ymdLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const dayLabel = (ymd) => {
+  const today = ymdLocal();
+  const tomorrow = ymdLocal(new Date(Date.now() + 864e5));
+  if (ymd === today) return "Today";
+  if (ymd === tomorrow) return "Tomorrow";
+  return new Date(ymd + "T12:00:00").toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+};
+const shortCourse = (name = "") => name.split(/ [–-] /)[0];
+const courseById = (id) => (state.courses || []).find((c) => c.id === Number(id));
+
+function dueText(item, nextClass) {
+  if (!item.readBy) return "";
+  const past = item.readBy < ymdLocal() && !item.done;
+  return `${past ? "Was due " : "Read by "}${dayLabel(item.readBy)}${item.readBy === nextClass ? " · next class" : ""}`;
+}
+
+// Today panel: readings and to-dos from every class, soonest first.
+async function loadReadings() {
+  const list = $("#readingList");
+  try {
+    const items = await api("/api/library/upcoming");
+    if (!items.length) {
+      list.replaceChildren(el("li", { class: "empty-note" }, "Nothing yet. Tap a class below to add readings, notes and files."));
+      return;
+    }
+    list.replaceChildren(
+      ...items.slice(0, 6).map((i) => {
+        const past = i.readBy < ymdLocal();
+        const cls = past || i.readBy === ymdLocal() ? "urgent" : i.readBy <= ymdLocal(new Date(Date.now() + 2 * 864e5)) ? "soon" : "later";
+        return el(
+          "li",
+          { class: `deadline ${cls}`, tabindex: "0", role: "button", onclick: () => openClass(i.courseId, i.id), onkeydown: (e) => e.key === "Enter" && openClass(i.courseId, i.id) },
+          el("span", { class: "bar" }),
+          el("div", { class: "info" }, el("div", { class: "title" }, i.kind === "task" ? i.title : `Read: ${i.title}`), el("div", { class: "meta" }, `${shortCourse(courseById(i.courseId)?.name || "")}${i.remindAt ? " · 🔔 reminder set" : ""}`)),
+          el("span", { class: "when" }, past ? "Late" : dayLabel(i.readBy).replace(/,.*/, "")),
+        );
+      }),
+    );
+  } catch {
+    list.replaceChildren();
+  }
+}
+
+async function openClass(courseId, focusId = null) {
+  const course = courseById(courseId) || { id: Number(courseId), name: "Class" };
+  lib.course = course;
+  lib.open = focusId;
+  lib.scrollTo = focusId;
+  lib.editing = null;
+  $("#classTitle").textContent = course.name;
+  $("#libEditor").classList.add("hidden");
+  $("#libList").replaceChildren(el("div", { class: "skeleton" }), el("div", { class: "skeleton" }));
+  const sheet = $("#classSheet");
+  if (!sheet.open) sheet.showModal();
+  await refreshClass();
+}
+
+async function refreshClass() {
+  try {
+    lib.data = await api(`/api/library/${lib.course.id}`);
+    renderClass();
+  } catch (err) {
+    $("#libList").replaceChildren(el("div", { class: "empty-note" }, err.message));
+  }
+}
+
+function renderClass() {
+  const d = lib.data;
+  $("#dayChips").replaceChildren(
+    ...DAY_ORDER.map((day) =>
+      el(
+        "button",
+        {
+          type: "button",
+          class: `day-chip${d.classDays.includes(day) ? " on" : ""}`,
+          "aria-pressed": String(d.classDays.includes(day)),
+          title: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day],
+          onclick: async () => {
+            const days = d.classDays.includes(day) ? d.classDays.filter((x) => x !== day) : [...d.classDays, day];
+            lib.data = await api(`/api/library/${lib.course.id}/days`, { method: "PUT", body: { days } });
+            renderClass();
+          },
+        },
+        DAY_SHORT[day],
+      ),
+    ),
+  );
+  $("#nextClass").textContent = d.nextClass ? `Next class: ${dayLabel(d.nextClass)}` : "Tap the days it meets";
+
+  const today = ymdLocal();
+  const groups = [
+    ["Due next class", (i) => !i.done && i.readBy && d.nextClass && i.readBy <= d.nextClass],
+    ["Coming up", (i) => !i.done && i.readBy && !(d.nextClass && i.readBy <= d.nextClass)],
+    ["Notes & files", (i) => !i.done && !i.readBy],
+    ["Done", (i) => i.done],
+  ];
+  if (!d.nextClass) groups[0] = ["Overdue & today", (i) => !i.done && i.readBy && i.readBy <= today];
+  const used = new Set();
+  const sections = [];
+  for (const [label, test] of groups) {
+    const items = d.items.filter((i) => !used.has(i.id) && test(i));
+    items.forEach((i) => used.add(i.id));
+    if (label !== "Notes & files" && label !== "Done") items.sort((a, b) => a.readBy.localeCompare(b.readBy));
+    if (items.length) sections.push(el("div", { class: "lib-group" }, label), ...items.map(libRow));
+  }
+  $("#libList").replaceChildren(
+    ...(sections.length
+      ? sections
+      : [
+          el(
+            "div",
+            { class: "lib-empty" },
+            el("div", { class: "lib-empty-icon", html: icon("folder", 28) }),
+            el("b", {}, "This class is empty"),
+            el("p", {}, "Upload your notes or slides, write a note, add a reading that's due next class, or let Cuss bring in the files from Canvas."),
+          ),
+        ]),
+  );
+  if (lib.scrollTo) document.getElementById(`lib-${lib.scrollTo}`)?.scrollIntoView({ block: "center" });
+  lib.scrollTo = null;
+}
+
+function libRow(item) {
+  const kindIcon = { canvas: "file", upload: "upload", note: "note", task: "list" }[item.kind];
+  const source = { canvas: "From Canvas", upload: "Uploaded", note: item.addedBy === "cuss" ? "Saved by Cuss" : "Your note", task: item.addedBy === "cuss" ? "Added by Cuss" : "To-do" }[item.kind];
+  const due = dueText(item, lib.data.nextClass);
+  const late = item.readBy && item.readBy < ymdLocal() && !item.done;
+  const open = lib.open === item.id;
+  const row = el(
+    "div",
+    { class: `lib-item${item.done ? " done" : ""}${open ? " open" : ""}`, id: `lib-${item.id}` },
+    el(
+      "div",
+      { class: "lib-main" },
+      el("input", {
+        type: "checkbox",
+        class: "lib-check",
+        checked: item.done,
+        "aria-label": item.done ? "Mark not done" : "Mark done",
+        onchange: (e) => patchItem(item, { done: e.target.checked }),
+      }),
+      el(
+        "button",
+        { type: "button", class: "lib-body", "aria-expanded": String(open), onclick: () => ((lib.open = open ? null : item.id), renderClass()) },
+        el("span", { class: `lib-kind k-${item.kind}`, html: icon(kindIcon, 16) }),
+        el(
+          "span",
+          { class: "lib-text" },
+          el("span", { class: "lib-title" }, item.title),
+          el("span", { class: "lib-meta" }, [source, due && el("b", { class: late ? "late" : "" }, due), item.remindAt && `🔔 ${new Date(item.remindAt).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}`].filter(Boolean).flatMap((x, n) => (n ? [" · ", x] : [x]))),
+        ),
+      ),
+    ),
+  );
+  if (open) row.append(libActions(item));
+  return row;
+}
+
+function libActions(item) {
+  const box = el("div", { class: "lib-actions-panel" });
+  const course = lib.course.name;
+  const ask = (prompt) => {
+    $("#classSheet").close();
+    closePanels();
+    send(prompt);
+  };
+  const due = el(
+    "div",
+    { class: "lib-line" },
+    el("span", { class: "lib-line-label" }, "Read by"),
+    el("button", { type: "button", class: "chip", onclick: () => patchItem(item, { readBy: "next_class" }) }, "Next class"),
+    el("input", { type: "date", class: "chip-date", value: item.readBy || "", "aria-label": "Pick a date", onchange: (e) => patchItem(item, { readBy: e.target.value }) }),
+    item.readBy && el("button", { type: "button", class: "chip ghost", onclick: () => patchItem(item, { readBy: "" }) }, "Clear"),
+  );
+  const defaultRemind = () => {
+    const base = item.readBy ? new Date(item.readBy + "T19:00:00") : new Date(Date.now() + 864e5);
+    if (item.readBy) base.setDate(base.getDate() - 1);
+    else base.setHours(18, 0, 0, 0);
+    return new Date(base - base.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+  };
+  const remindInput = el("input", { type: "datetime-local", class: "chip-date", value: item.remindAt ? new Date(new Date(item.remindAt) - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : defaultRemind(), "aria-label": "Reminder time" });
+  const remind = el(
+    "div",
+    { class: "lib-line" },
+    el("span", { class: "lib-line-label" }, "Remind me"),
+    remindInput,
+    el("button", { type: "button", class: "chip", onclick: () => remindInput.value && patchItem(item, { remindAt: new Date(remindInput.value).toISOString() }, "Reminder set") }, item.remindAt ? "Update" : "Set"),
+    item.remindAt && el("button", { type: "button", class: "chip ghost", onclick: () => patchItem(item, { remindAt: "" }) }, "Remove"),
+  );
+  const apple = el(
+    "div",
+    { class: "lib-line" },
+    el("button", { type: "button", class: "chip", onclick: () => addToCalendar(item) }, iconEl("calendar", 14), "Add to Calendar"),
+    el("button", { type: "button", class: "chip", onclick: () => addToReminders(item) }, iconEl("bell", 14), "Add to Reminders"),
+  );
+  const study = el(
+    "div",
+    { class: "lib-line" },
+    el("button", { type: "button", class: "chip accent", onclick: () => ask(`Summarize "${item.title}" from my ${course} class library (item ${item.id}).`) }, iconEl("sparkles", 14), "Summarize"),
+    el("button", { type: "button", class: "chip accent", onclick: () => ask(`Quiz me on "${item.title}" from my ${course} class library (item ${item.id}).`) }, iconEl("help", 14), "Quiz me"),
+    item.kind === "upload" && el("a", { class: "chip", href: `/api/library/item/${item.id}/file`, target: "_blank", rel: "noopener" }, iconEl("external", 14), "Open"),
+    (item.kind === "note" || item.kind === "task") && el("button", { type: "button", class: "chip", onclick: () => editItem(item) }, iconEl("note", 14), item.hasText ? "View & edit" : "Edit"),
+    el("span", { class: "spacer" }),
+    el(
+      "button",
+      {
+        type: "button",
+        class: "chip danger",
+        onclick: async () => {
+          if (!confirm(`Delete “${item.title}”?`)) return;
+          await api(`/api/library/item/${item.id}`, { method: "DELETE" });
+          lib.open = null;
+          refreshClass();
+          loadReadings();
+        },
+      },
+      iconEl("trash", 14),
+      "Delete",
+    ),
+  );
+  box.append(due, remind, apple, study);
+  return box;
+}
+
+async function patchItem(item, patch, message) {
+  try {
+    await api(`/api/library/item/${item.id}`, { method: "PATCH", body: patch });
+    if (message) toast(message, item.title, { iconName: "bell" });
+    await refreshClass();
+    loadReadings();
+  } catch (err) {
+    toast("Couldn't save that", err.message, { iconName: "alert" });
+  }
+}
+
+// --- Notes and to-dos editor
+function showEditor(kind, item = null) {
+  lib.editing = { kind, item };
+  const f = $("#libEditor");
+  f.classList.remove("hidden");
+  $("#libEditTitle").value = item?.title || "";
+  $("#libEditTitle").placeholder = kind === "task" ? "e.g. Read chapter 4, pages 80–95" : "Title, e.g. Week 8 lecture notes";
+  $("#libEditText").value = item?.text || "";
+  $("#libEditText").placeholder = kind === "task" ? "Details (optional)" : "Your notes…";
+  $("#libEditText").rows = kind === "task" ? 2 : 7;
+  $("#libEditDue").value = item?.readBy ? "pick" : kind === "task" && lib.data.nextClass ? "next_class" : "";
+  $("#libEditDate").value = item?.readBy || "";
+  $("#libEditDate").classList.toggle("hidden", $("#libEditDue").value !== "pick");
+  $("#libEditDue").closest(".lib-editor-row").querySelector("label").classList.toggle("hidden", !!item);
+  $("#libEditDate").classList.toggle("hidden", !!item || $("#libEditDue").value !== "pick");
+  $("#libEditTitle").focus();
+}
+
+async function editItem(item) {
+  const full = await api(`/api/library/item/${item.id}`);
+  showEditor(item.kind, full);
+}
+
+$("#libEditDue").addEventListener("change", (e) => $("#libEditDate").classList.toggle("hidden", e.target.value !== "pick"));
+$("#libEditCancel").addEventListener("click", () => $("#libEditor").classList.add("hidden"));
+$("#libEditor").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { kind, item } = lib.editing || {};
+  const title = $("#libEditTitle").value.trim();
+  const text = $("#libEditText").value;
+  const choice = $("#libEditDue").value;
+  const readBy = choice === "pick" ? $("#libEditDate").value || undefined : choice || undefined;
+  try {
+    if (item) await api(`/api/library/item/${item.id}`, { method: "PATCH", body: { title, text } });
+    else await api(`/api/library/${lib.course.id}/${kind === "task" ? "tasks" : "notes"}`, { method: "POST", body: { title: title || (kind === "task" ? "" : `Notes · ${dayLabel(ymdLocal())}`), text, readBy } });
+    $("#libEditor").classList.add("hidden");
+    await refreshClass();
+    loadReadings();
+  } catch (err) {
+    toast("Couldn't save that", err.message, { iconName: "alert" });
+  }
+});
+$("#libNewNote").addEventListener("click", () => showEditor("note"));
+$("#libNewTask").addEventListener("click", () => showEditor("task"));
+$("#classClose").addEventListener("click", () => $("#classSheet").close());
+$("#classSheet").addEventListener("click", (e) => e.target === $("#classSheet") && $("#classSheet").close());
+
+$("#libUpload").addEventListener("change", async (e) => {
+  const files = [...e.target.files];
+  e.target.value = "";
+  for (const f of files) {
+    try {
+      const res = await fetch(`/api/library/${lib.course.id}/upload`, {
+        method: "POST",
+        headers: { "Content-Type": f.type || "application/octet-stream", "X-File-Name": encodeURIComponent(f.name) },
+        body: f,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Upload failed.");
+      toast("Uploaded", f.name, { iconName: "upload" });
+    } catch (err) {
+      toast(`Couldn't upload ${f.name}`, err.message, { iconName: "alert" });
+    }
+  }
+  refreshClass();
+});
+
+$("#libImport").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  try {
+    const r = await api(`/api/library/${lib.course.id}/import`, { method: "POST" });
+    toast(r.added ? `Brought in ${r.added} file${r.added === 1 ? "" : "s"} from Canvas` : "Already up to date", r.total ? `${r.total} file${r.total === 1 ? "" : "s"} in this Canvas course` : "This course has no files in Canvas yet.", { iconName: "sparkles" });
+    await refreshClass();
+  } catch (err) {
+    toast("Couldn't reach Canvas", err.message, { iconName: "alert" });
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// --- iPhone Calendar and Reminders
+function itemWhen(item) {
+  if (item.remindAt) return new Date(item.remindAt);
+  if (item.readBy) return new Date(item.readBy + "T09:00:00");
+  return null;
+}
+
+async function addToCalendar(item) {
+  if (!item.readBy && !item.remindAt) return toast("Pick a date first", "Set “Read by” or a reminder, then add it to your calendar.", { iconName: "calendar" });
+  const native = nativeCal();
+  if (native?.createEvent) {
+    try {
+      await native.requestFullCalendarAccess?.();
+      const start = item.readBy ? new Date(item.readBy + "T00:00:00") : new Date(item.remindAt);
+      await native.createEvent({
+        title: item.kind === "task" ? item.title : `Read: ${item.title}`,
+        startDate: start.getTime(),
+        endDate: item.readBy ? start.getTime() + 864e5 : start.getTime() + 15 * 6e4,
+        isAllDay: !!item.readBy,
+        notes: lib.course.name,
+        alerts: item.readBy ? [-360] : [0],
+      });
+      return toast("Added to Calendar", item.title, { iconName: "calendar" });
+    } catch {}
+  }
+  // iPhone Safari opens this as an event with an "Add to Calendar" button;
+  // computers download it for Calendar, Outlook or Google Calendar.
+  location.href = `/api/library/item/${item.id}/ics`;
+}
+
+async function addToReminders(item) {
+  const when = itemWhen(item);
+  const title = item.kind === "task" ? item.title : `Read: ${item.title}`;
+  const native = nativeCal();
+  if (native?.createReminder) {
+    try {
+      await native.requestFullRemindersAccess?.();
+      await native.createReminder({ title, notes: lib.course.name, dueDate: when?.getTime() });
+      return toast("Added to Reminders", title, { iconName: "bell" });
+    } catch {}
+  }
+  const text = `${title} (${shortCourse(lib.course.name)})${when ? `, ${item.readBy ? `by ${dayLabel(item.readBy)}` : when.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : ""}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text });
+      return;
+    } catch (err) {
+      if (err.name === "AbortError") return;
+    }
+  }
+  await navigator.clipboard?.writeText(text).catch(() => {});
+  toast("Copied", "Paste it into Reminders. In the iPhone app, Cuss adds it directly.", { iconName: "bell" });
+}
+
+// A private calendar link that keeps deadlines, readings and reminders in sync.
+$("#calSubscribeBtn").addEventListener("click", async () => {
+  try {
+    const { https, webcal } = await api("/api/calendar-link", { method: "POST" });
+    if (isApple && !/localhost|127\.0\.0\.1/.test(https)) {
+      location.href = webcal;
+      toast("Opening Calendar", "Tap Subscribe. Deadlines, readings and reminders stay in sync.", { iconName: "calendar" });
+    } else {
+      await navigator.clipboard?.writeText(https).catch(() => {});
+      toast("Calendar link copied", /localhost|127\.0\.0\.1/.test(https) ? "This link works once Cuss is online (not on localhost)." : "Google Calendar: Other calendars → From URL. Outlook: Add calendar → Subscribe from web.", { iconName: "calendar" });
+    }
+  } catch (err) {
+    toast("Couldn't make a calendar link", err.message, { iconName: "alert" });
+  }
+});

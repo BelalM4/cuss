@@ -104,8 +104,13 @@
       <ul class="deadlines" id="deadlineList">
         <li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li>
       </ul>
-      <a class="cal-link" href="/calendar.ics"><i data-icon="calendar"></i>Add all deadlines to my calendar</a>
-      <div class="panel-label">Courses</div>
+      <div class="panel-label" id="readingLabel">Readings &amp; to-dos</div>
+      <ul class="deadlines" id="readingList"></ul>
+      <div class="cal-row">
+        <button type="button" class="cal-link" id="calSubscribeBtn"><i data-icon="calendar"></i>Add to my iPhone Calendar</button>
+        <a class="cal-link subtle" href="/calendar.ics" download>or download .ics</a>
+      </div>
+      <div class="panel-label">Classes <span class="label-hint">tap for files &amp; notes</span></div>
       <ul class="courses" id="courseList"><li class="skeleton short"></li><li class="skeleton short"></li></ul>
       <div class="panel-label">Your impact with Cuss</div>
       <div class="impact-row" id="impactRow"></div>
@@ -197,6 +202,52 @@
         <button type="submit" class="btn" id="settingsSave">Save</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- One class: its files, notes, readings and to-dos -->
+  <dialog id="classSheet" class="class-sheet" aria-labelledby="classTitle">
+    <div class="sheet-inner">
+      <div class="dialog-head">
+        <div>
+          <div class="sheet-kicker">Class files &amp; notes</div>
+          <h2 id="classTitle">Class</h2>
+        </div>
+        <button type="button" class="icon-btn ghost" id="classClose" title="Close" aria-label="Close"><i data-icon="x"></i></button>
+      </div>
+
+      <div class="meets">
+        <span class="meets-label">Class meets</span>
+        <div class="day-chips" id="dayChips" role="group" aria-label="Days this class meets"></div>
+        <span class="next-class" id="nextClass"></span>
+      </div>
+
+      <div class="lib-actions">
+        <label class="btn small lib-upload"><i data-icon="upload"></i>Upload<input type="file" id="libUpload" multiple accept=".pdf,.docx,.pptx,.txt,.md,.csv,image/*" hidden /></label>
+        <button type="button" class="btn ghost small" id="libNewNote"><i data-icon="note"></i>Write a note</button>
+        <button type="button" class="btn ghost small" id="libNewTask"><i data-icon="list"></i>Add a reading or to-do</button>
+        <button type="button" class="btn ghost small" id="libImport"><i data-icon="sparkles"></i>Bring in Canvas files</button>
+      </div>
+
+      <form class="lib-editor hidden" id="libEditor">
+        <input id="libEditTitle" placeholder="Title" aria-label="Title" maxlength="200" />
+        <textarea id="libEditText" rows="6" placeholder="Your notes…" aria-label="Note text"></textarea>
+        <div class="lib-editor-row">
+          <label class="inline">Read by
+            <select id="libEditDue">
+              <option value="">No date</option>
+              <option value="next_class">Next class</option>
+              <option value="pick">Pick a date…</option>
+            </select>
+          </label>
+          <input type="date" id="libEditDate" class="hidden" aria-label="Date" />
+          <span class="spacer"></span>
+          <button type="button" class="btn ghost small" id="libEditCancel">Cancel</button>
+          <button type="submit" class="btn small" id="libEditSave">Save</button>
+        </div>
+      </form>
+
+      <div class="lib-list" id="libList" aria-live="polite"></div>
+    </div>
   </dialog>
 
   <div class="toasts" id="toasts"></div>
