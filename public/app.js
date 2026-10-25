@@ -896,7 +896,15 @@ const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognizer = null;
 let listening = false;
 
-// Listens for one utterance. Calls onText(interim) while speaking; resolves with the final text.
+// Listens until the student stops talking. Calls onText(transcript) while they
+// speak and resolves with everything they said. Browsers (iPhone Safari above
+// all) end recognition at the first pause and often never mark words "final",
+// so Cuss keeps every word it hears, decides itself when the student is done
+// (a short silence), and quietly restarts if the browser stops too early.
+const SILENCE_MS = 1800; // pause that means "I'm done"
+const NO_SPEECH_MS = 9000; // give up if nothing is said at all
+let finishListening = null; // ends the current listen early (the Done button)
+
 function listenOnce(onText = () => {}) {
   return new Promise((resolve) => {
     if (!Recognition) {
@@ -904,36 +912,78 @@ function listenOnce(onText = () => {}) {
       return resolve("");
     }
     stopSpeaking();
-    recognizer = new Recognition();
-    recognizer.lang = navigator.language || "en-US";
-    recognizer.interimResults = true;
-    recognizer.continuous = false;
-    let finalText = "";
-    recognizer.onresult = (e) => {
-      let interim = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
-        else interim += e.results[i][0].transcript;
-      }
-      onText((finalText + interim).trim());
-    };
-    recognizer.onerror = (e) => {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") toast("Microphone blocked", "Allow microphone access in your browser to talk to Cuss.", { iconName: "mic" });
-    };
-    recognizer.onend = () => {
+    let kept = ""; // words from earlier sessions, if the browser restarted
+    let heard = ""; // words from the current session
+    let done = false;
+    let timer = null;
+    let restarts = 0;
+    const text = () => `${kept} ${heard}`.replace(/\s+/g, " ").trim();
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      finishListening = null;
       listening = false;
-      resolve(finalText.trim());
+      try {
+        recognizer?.stop();
+      } catch {}
+      resolve(text());
     };
-    try {
+    const wait = (ms) => {
+      clearTimeout(timer);
+      timer = setTimeout(finish, ms);
+    };
+    finishListening = finish;
+
+    const startSession = () => {
+      recognizer = new Recognition();
+      recognizer.lang = navigator.language || "en-US";
+      recognizer.interimResults = true;
+      recognizer.continuous = true;
+      recognizer.onresult = (e) => {
+        let all = "";
+        for (let i = 0; i < e.results.length; i++) all += e.results[i][0].transcript;
+        heard = all;
+        onText(text());
+        wait(SILENCE_MS);
+      };
+      recognizer.onerror = (e) => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          toast("Microphone blocked", "Allow microphone access for this site in your browser settings, then tap to talk.", { iconName: "mic" });
+          finish();
+        } else if (e.error === "audio-capture") {
+          toast("No microphone found", "Check that a microphone is connected and not in use by another app.", { iconName: "mic" });
+          finish();
+        }
+      };
+      recognizer.onend = () => {
+        if (done) return;
+        // The browser stopped on its own (a pause, or its time limit): keep what
+        // was said and listen again until the student is actually finished.
+        kept = text();
+        heard = "";
+        if (++restarts > 30) return finish();
+        try {
+          startSession();
+        } catch {
+          finish();
+        }
+      };
       recognizer.start();
+    };
+
+    try {
+      startSession();
       listening = true;
+      wait(NO_SPEECH_MS);
     } catch {
-      resolve("");
+      finish();
     }
   });
 }
 
 function stopListening() {
+  if (finishListening) return finishListening();
   try {
     recognizer?.stop();
   } catch {}
@@ -948,7 +998,7 @@ async function dictate() {
   const text = await listenOnce((t) => (($("#input").value = t), autosize()));
   $("#micBtn").classList.remove("listening");
   $("#voiceHint").classList.remove("live");
-  $("#voiceHint").innerHTML = "Cuss reads your Canvas so you don't have to. <kbd>Enter</kbd> to send · <kbd>⌘M</kbd> to talk";
+  $("#voiceHint").innerHTML = "<kbd>Enter</kbd> to send · <kbd>Shift Enter</kbd> for a new line";
   if (!text) return;
   const reply = await send(text, { viaVoice: true });
   if (state.speakReplies && reply) speak(reply);
@@ -965,15 +1015,21 @@ function setVoiceCaption(text) {
   $("#voiceCaption").textContent = text.length > 280 ? "…" + text.slice(-280) : text;
 }
 
+function setVoiceButton(label) {
+  $("#voiceTap").textContent = label;
+}
+
 async function voiceTurn() {
   if (!state.voiceMode) return;
   setVoiceState("listening", "Listening…");
-  setVoiceCaption("Go ahead, I'm listening.");
+  setVoiceCaption("Go ahead, I'm listening. Take your time.");
+  setVoiceButton("Done");
   const text = await listenOnce((t) => setVoiceCaption(t));
+  setVoiceButton("Tap to talk");
   if (!state.voiceMode) return;
   if (!text) {
     setVoiceState("listening", "Tap to talk");
-    setVoiceCaption("I didn't catch that. Tap “Tap to talk” and try again.");
+    setVoiceCaption("I didn't hear anything. Tap “Tap to talk” and try again.");
     return;
   }
   setVoiceState("thinking", "Thinking…");
@@ -1354,11 +1410,14 @@ $("#micBtn").addEventListener("click", dictate);
 $("#voiceModeBtn").addEventListener("click", openVoiceMode);
 $("#voiceEnd").addEventListener("click", closeVoiceMode);
 $("#voiceClose").addEventListener("click", closeVoiceMode);
+// While listening, the button is "Done" and sends right away. Otherwise it
+// starts listening. It must start the microphone directly inside the tap:
+// iPhone Safari blocks a microphone start that comes later.
 $("#voiceTap").addEventListener("click", () => {
   if (state.busy) return;
+  if (listening) return stopListening();
   stopSpeaking();
-  stopListening();
-  setTimeout(voiceTurn, 150);
+  voiceTurn();
 });
 $("#speakToggle").addEventListener("click", () => setSpeak(!state.speakReplies));
 $("#settingsBtn").addEventListener("click", openSettings);
