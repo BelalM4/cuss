@@ -103,6 +103,7 @@ It also installs like an app: on iPhone or Android, open the link and tap **Add 
 - That trust matters most for student-facing AI: showing the steps, citing the course material, and never sending anything without consent.
 
 ## What's next for Cuss
+- **Cuss for Professors:** role-aware class health, grading queues, and approval-only announcement/student-nudge drafts are already available in the Demo University flow; the next step is piloting those workflows with instructors.
 - **Official approval at San Francisco State University** (we've [applied / are applying] for a Canvas developer key), then a pilot with students.
 - App Store and Google Play release with native push notifications (the Capacitor project is ready).
 - Google Calendar and school email (Gmail/Outlook) integration.

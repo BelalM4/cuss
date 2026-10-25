@@ -49,6 +49,10 @@ app.use((req, res, next) => {
   else next();
 });
 
+app.get("/", (req, res, next) => {
+  if (req.userId && getConfig().role === "professor") return res.sendFile(path.join(here, "public", "professor.html"));
+  next();
+});
 app.use(express.static(path.join(here, "public")));
 
 const wrap = (fn) => async (req, res) => {
@@ -89,8 +93,8 @@ app.get("/auth/info", (req, res) => {
 
 // Step 1: send the student to the school's Canvas/SSO login page
 // (or the demo school's pretend login page).
-function beginLogin(res, demo) {
-  const state = crypto.randomBytes(24).toString("base64url") + (demo ? ".demo" : "");
+function beginLogin(res, demo, role = "student") {
+  const state = crypto.randomBytes(24).toString("base64url") + (demo ? `.demo.${role}` : "");
   res.append("Set-Cookie", `cuss_oauth_state=${state}; ${auth.cookieOptions(600)}`);
   res.redirect(auth.authorizeUrl(state, { demo }));
 }
@@ -102,7 +106,7 @@ app.get("/auth/login", (req, res) => {
 
 app.get("/auth/demo", (req, res) => {
   if (!serverConfig().demo) return res.redirect("/login.html?error=" + encodeURIComponent("The demo is turned off."));
-  beginLogin(res, true);
+  beginLogin(res, true, req.query.role === "professor" ? "professor" : "student");
 });
 
 // Step 2: Canvas sends them back here with a one-time code.
@@ -113,7 +117,12 @@ app.get("/auth/callback", async (req, res) => {
   if (!code || !state || state !== auth.parseCookies(req).cuss_oauth_state) return fail("That login link expired. Please try again.");
   res.append("Set-Cookie", `cuss_oauth_state=; ${auth.cookieOptions(0)}`);
   try {
-    const userId = await auth.finishLogin(String(code), { demo: String(state).endsWith(".demo") });
+    const demo = String(state).includes(".demo");
+    const userId = await auth.finishLogin(String(code), { demo });
+    if (!demo) {
+      const role = await runAsUser(userId, () => canvas.getUserRole().catch(() => "student"));
+      runAsUser(userId, () => saveConfig({ role }));
+    }
     auth.startSession(res, userId);
     runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.redirect("/");
@@ -137,8 +146,10 @@ app.post(
     const profile = await r.json();
     const userId = String(profile.id);
     runAsUser(userId, () =>
-      saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "" }),
+      saveConfig({ accessToken: token, refreshToken: "", tokenExpiresAt: 0, studentName: profile.short_name || profile.name || "", role: "student" }),
     );
+    const role = await runAsUser(userId, () => canvas.getUserRole().catch(() => "student"));
+    runAsUser(userId, () => saveConfig({ role }));
     auth.startSession(res, userId);
     runAsUser(userId, () => Promise.all([checkReminders(), checkInbox()]).catch(() => {}));
     res.json({ ok: true });
@@ -183,12 +194,18 @@ app.get("/api/status", (req, res) => {
     demo: c.demo,
     schoolName: serverConfig().schoolName,
     studentName: c.studentName,
+    role: c.role || "student",
     reminderHours: c.reminderHours,
     independent: c.independent,
     briefingTime: c.briefingTime,
     autoSendEmails: c.autoSendEmails,
   });
 });
+
+app.get("/api/professor/dashboard", wrap(async (req, res) => {
+  if (getConfig().role !== "professor") return res.status(403).json({ error: "Professor access required." });
+  res.json({ courses: await canvas.getTeachingDashboard() });
+}));
 
 app.post(
   "/api/settings",
@@ -342,9 +359,18 @@ app.post(
     if (draft.status === "sent") return res.json({ ok: true, alreadySent: true });
     const subject = String(req.body?.subject ?? draft.subject).trim();
     const body = String(req.body?.body ?? draft.body).trim();
-    if (!body || (!subject && draft.kind !== "reply")) return res.status(400).json({ error: "Subject and message can't be empty." });
-    if (draft.kind === "reply") {
+    if (!body || (!subject && draft.kind !== "reply" && draft.kind !== "announcement")) return res.status(400).json({ error: "Subject and message can't be empty." });
+    if (draft.kind === "announcement") {
+      if (getConfig().role !== "professor") return res.status(403).json({ error: "Professor access required." });
+      await canvas.postAnnouncement(draft.courseId, String(req.body?.title ?? draft.title).trim(), body);
+      Object.assign(draft, { status: "sent", title: String(req.body?.title ?? draft.title).trim(), body });
+    } else if (draft.kind === "reply") {
       await canvas.replyToConversation(draft.conversationId, body);
+      Object.assign(draft, { status: "sent", subject, body });
+    } else if (draft.kind === "nudge") {
+      if (getConfig().role !== "professor") return res.status(403).json({ error: "Professor access required." });
+      await canvas.sendMessage({ courseId: draft.courseId, recipientIds: draft.recipients.map((r) => r.id), subject, body });
+      Object.assign(draft, { status: "sent", subject, body });
     } else {
       await canvas.sendMessage({
         courseId: draft.courseId,
@@ -353,7 +379,7 @@ app.post(
         body,
       });
     }
-    Object.assign(draft, { status: "sent", subject, body });
+    if (draft.status !== "sent") Object.assign(draft, { status: "sent", subject, body });
     chats.saveDraft(draft);
     chats.updateCardEverywhere(draft.id, { status: "sent", subject, body });
     recordImpact(draft.kind === "reply" ? "reply_sent" : "email_sent");

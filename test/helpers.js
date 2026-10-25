@@ -91,13 +91,13 @@ export function client(base) {
     jar,
     json: async (p, opts) => (await request(p, opts)).json(),
     // Full demo sign-in: app → demo school login page → approve → callback.
-    async loginDemo(name) {
-      const start = await request("/auth/demo");
+    async loginDemo(name, role = "student") {
+      const start = await request(role === "professor" ? "/auth/demo?role=professor" : "/auth/demo");
       const authorize = new URL(start.headers.get("location"));
       const approve = await request(new URL("approve", authorize).href, {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ redirect_uri: authorize.searchParams.get("redirect_uri"), state: authorize.searchParams.get("state"), name }),
+        body: new URLSearchParams({ redirect_uri: authorize.searchParams.get("redirect_uri"), state: authorize.searchParams.get("state"), name, role }),
       });
       const callback = await request(approve.headers.get("location"));
       if (callback.status !== 302 || callback.headers.get("location") !== "/") throw new Error("login failed: " + callback.headers.get("location"));

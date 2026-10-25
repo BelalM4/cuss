@@ -63,4 +63,4 @@ Judges will ask. Have these answers ready:
 - **Did you build this at Cal Hacks?** Yes, it was started at the event. The GitHub commit history shows it.
 - **How does it connect to Canvas?** Canvas's official OAuth2 sign-in through the school's SSO, the same way approved apps connect. Each school approves Cuss once, and then any student can log in.
 - **What's real and what's simulated?** The AI, the agent loop, the Canvas API integration and the sign-in are real. "Demo University" is a mock Canvas with sample classes, so we can demo without exposing a real student's data; it speaks the same API as real Canvas.
-- **What's next?** An SF State pilot, App Store and Google Play apps with push notifications, and calendar sync.
+- **What's next?** An SF State pilot, App Store and Google Play apps with push notifications, and calendar sync. We also have a professor mode that surfaces class health and keeps announcements and student nudges as drafts until the instructor approves them.

@@ -7,6 +7,11 @@ import { startFakeClaude, startCuss, client } from "./helpers.js";
 
 const T = (name, input) => ({ type: "tool_use", name, input });
 const script = (text, step) => {
+  if (/announcement/i.test(text))
+    return [
+      [T("draft_announcement", { course_id: 101, title: "Quiz support", body: "Please come to office hours if you want help preparing for Quiz 5." })],
+      [{ type: "text", text: "I prepared an announcement draft for your review." }],
+    ][Math.min(step, 1)];
   if (/email/i.test(text))
     return [
       [T("get_instructors", { course_id: 101 })],
@@ -47,6 +52,25 @@ test("demo OAuth sign-in creates a session and an encrypted token on disk", asyn
   const users = fs.readdirSync(path.join(app.dataDir, "users"));
   const cfgs = users.map((u) => fs.readFileSync(path.join(app.dataDir, "users", u, "config.json"), "utf8"));
   assert.ok(cfgs.every((cfg) => cfg.includes('"accessToken": "enc:v1:') && !/"accessToken": "demo-/.test(cfg)));
+});
+
+test("professor demo is role-gated and exposes class health", async () => {
+  const c = client(app.url);
+  await c.loginDemo("Dr. Maya Chen", "professor");
+  const status = await c.json("/api/status");
+  assert.equal(status.role, "professor");
+  const dashboard = await c.json("/api/professor/dashboard");
+  assert.equal(dashboard.courses.length, 1);
+  assert.equal(dashboard.courses[0].roster.length, 4);
+  assert.ok(dashboard.courses[0].gradingQueue.length > 0);
+  const home = await c.request("/");
+  assert.match(await home.text(), /Cuss for Professors/);
+  const chat = await c.chat("prof-chat-0001", "Draft an announcement for my class");
+  const [draft] = cardsOf(chat.events);
+  assert.equal(draft.kind, "announcement");
+  assert.equal(draft.status, "draft");
+  const send = await c.request(`/api/drafts/${draft.id}/send`, { method: "POST", json: { title: draft.title, body: draft.body } });
+  assert.equal(send.status, 200);
 });
 
 test("dashboard: deadlines, missing work, unread inbox and course files", async () => {
