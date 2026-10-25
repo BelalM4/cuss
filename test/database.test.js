@@ -18,7 +18,7 @@ if (!process.env.TEST_DATABASE_URL) {
   let userId;
 
   before(async () => {
-    pool = new Pool({ connectionString: dbUrl });
+    pool = new Pool({ connectionString: dbUrl, application_name: "cuss-test" });
     await pool.query(`
       create table if not exists cuss_files (
         path text primary key,
@@ -65,6 +65,13 @@ if (!process.env.TEST_DATABASE_URL) {
     assert.equal(await (await restored.request(`/api/library/item/${upload.id}/file`)).text(), "Persist this upload.");
     const chat = await restored.json("/api/chats/database-chat-0001");
     assert.ok(chat.display.some((item) => JSON.stringify(item).includes("Here is your week.")));
+
+    // The database dropping idle connections (as Neon does when it sleeps)
+    // must not take the server down.
+    await pool.query("select pg_terminate_backend(pid) from pg_stat_activity where pid <> pg_backend_pid() and datname = current_database() and application_name <> 'cuss-test'");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await restored.json("/api/memory", { method: "POST", json: { text: "Still here after a dropped connection." } });
+    assert.equal((await restored.request("/api/status")).status, 200);
 
     const deleted = await restored.json("/api/account/delete", { method: "POST", json: {} });
     assert.equal(deleted.ok, true);
