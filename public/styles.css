@@ -1011,3 +1011,20 @@ button, [role="button"], input[type="checkbox"] { scroll-margin:20px; }
   #panelToggle.on { color: var(--accent); }
 }
 @media (min-width: 1181px) and (prefers-reduced-motion: reduce) { .app { transition: none; } }
+
+/* Show or hide the chat history sidebar on tablets and computers */
+.only-sidebar-toggle { display: none !important; }
+@media (min-width: 761px) {
+  .only-sidebar-toggle:not(.hidden) { display: inline-grid !important; }
+  .chat-head #sidebarToggle { margin-left: -6px; }
+  .app { transition: grid-template-columns .3s var(--ease); }
+  .app.sidebar-collapsed .sidebar { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+}
+@media (min-width: 761px) and (max-width: 1180px) {
+  .app.sidebar-collapsed { grid-template-columns: 0px minmax(0, 1fr); }
+}
+@media (min-width: 1181px) {
+  .app.sidebar-collapsed { grid-template-columns: 0px minmax(0, 1fr) 340px; }
+  .app.sidebar-collapsed.today-collapsed { grid-template-columns: 0px minmax(0, 1fr) 0px; }
+}
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) { .app { transition: none; } }

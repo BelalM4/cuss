@@ -1355,6 +1355,7 @@ function syncPanelAccessibility() {
   $(".chat").inert = history || today;
   $("#sidebar").inert = mobile && today;
   $("#today").inert = history || (!narrow && $(".app").classList.contains("today-collapsed"));
+  if (!mobile && $(".app").classList.contains("sidebar-collapsed")) $("#sidebar").inert = true;
   $("#menuBtn").setAttribute("aria-expanded", String(history));
   $("#todayBtn").setAttribute("aria-expanded", String(today));
 }
@@ -1454,6 +1455,23 @@ function setTodayCollapsed(collapsed) {
 }
 $("#panelToggle").addEventListener("click", () => setTodayCollapsed(!$(".app").classList.contains("today-collapsed")));
 setTodayCollapsed(store.get("todayCollapsed", false));
+
+// Larger screens: show or hide the chat history sidebar (remembered on this device).
+function setSidebarCollapsed(collapsed) {
+  $(".app").classList.toggle("sidebar-collapsed", collapsed);
+  const btn = $("#sidebarToggle");
+  const label = collapsed ? "Show the sidebar" : "Hide the sidebar";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  btn.setAttribute("aria-expanded", String(!collapsed));
+  $("#newChatMini").classList.toggle("hidden", !collapsed);
+  store.set("sidebarCollapsed", collapsed);
+  $("#sidebar").inert = false;
+  syncPanelAccessibility();
+}
+$("#sidebarToggle").addEventListener("click", () => setSidebarCollapsed(!$(".app").classList.contains("sidebar-collapsed")));
+$("#newChatMini").addEventListener("click", newChat);
+setSidebarCollapsed(store.get("sidebarCollapsed", false));
 document.querySelectorAll(".suggestion").forEach((s) => s.addEventListener("click", () => send(s.dataset.prompt)));
 document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") e.preventDefault(), dictate();
