@@ -961,49 +961,42 @@ button, [role="button"], input[type="checkbox"] { scroll-margin:20px; }
 .suggestion b { text-align:left; }
 
 /* ---------- iPhone layout (Apple Human Interface Guidelines) ----------
-   Large left-aligned title, iOS text sizes (34/17/15/13), inset grouped
-   list with tinted icons and chevrons, 44pt rows and 16pt margins. */
+   Centered navigation title, 16pt margins, 17pt text, and every screen
+   filling the display: the home screen centers its content, and Settings
+   opens as a full-screen page like Today and History. */
 @media (max-width: 760px) {
-  :root { --ios-grouped: #f2f2f7; --ios-row: #ffffff; --ios-sep: rgba(60, 60, 67, 0.29); }
-  .chat, .messages { background: var(--ios-grouped); }
-  .chat-head { min-height: 44px; padding-left: 16px; padding-right: 16px; }
-  .chat-head { display: grid; grid-template-columns: 1fr minmax(0, 52%) 1fr; align-items: center; }
+  .chat-head { min-height: 44px; padding-left: 16px; padding-right: 16px; display: grid; grid-template-columns: 1fr minmax(0, 52%) 1fr; align-items: center; }
   .chat-head #menuBtn { grid-column: 1; justify-self: start; }
   .chat-title { grid-column: 2; text-align: center; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
   .chat-head .head-actions { grid-column: 3; justify-self: end; }
   .composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
   .composer textarea:focus, .composer textarea:focus-visible { outline: none; box-shadow: none; }
   .messages { padding-left: 16px; padding-right: 16px; }
-
-  .welcome { text-align: left; padding: 8px 0 12px; }
-  .welcome .small-orb { width: 44px; height: 44px; margin: 6px 0 0 8px; }
-  .welcome h1 { font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.02em; margin: 12px 0 6px; }
-  .welcome-sub { font-size: 17px; line-height: 22px; margin: 0 0 22px; max-width: none; }
-
-  .suggestions { grid-template-columns: 1fr; gap: 0; background: var(--ios-row); border-radius: 12px; overflow: hidden; }
-  .suggestion, .suggestion:hover {
-    position: relative; display: flex; flex-direction: row; align-items: center; gap: 14px;
-    min-height: 50px; padding: 10px 16px; border-radius: 0; background: transparent; transform: none; animation: none;
-  }
-  .suggestion:active { background: rgba(0, 0, 0, 0.06); }
-  .suggestion + .suggestion::before { content: ""; position: absolute; top: 0; left: 59px; right: 0; height: 0.5px; background: var(--ios-sep); }
-  .suggestion::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-top: 2px solid #c4c4c7; border-right: 2px solid #c4c4c7; transform: rotate(45deg); border-radius: 1px; flex: none; }
-  .suggestion .ic { width: 29px; height: 29px; padding: 6px; margin: 0; border-radius: 7px; color: #fff; background: #007aff; flex: none; }
-  .suggestion:nth-child(2) .ic { background: #34c759; }
-  .suggestion:nth-child(3) .ic { background: #ff9500; }
-  .suggestion:nth-child(4) .ic { background: #af52de; }
-  .suggestion:nth-child(5) .ic { background: #ff2d55; }
-  .suggestion:nth-child(6) .ic { background: #5856d6; }
-  .suggestion b { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; }
-  .suggestion b + span { display: none; }
-
   .msg.bot .bubble, .msg.user .bubble { font-size: 17px; line-height: 1.4; }
-  .composer { border-radius: 22px; min-height: 44px; box-shadow: none; }
+  .composer { min-height: 44px; }
   .composer textarea { font-size: 17px; }
   .composer-hint { display: none; }
+
+  /* Home: content sits in the middle of the screen instead of bunching at the top. */
+  .messages:has(> .welcome:not(.hidden)) { display: flex; flex-direction: column; }
+  .messages > .welcome:not(.hidden) { margin: auto 0; padding: 12px 0 16px; width: 100%; }
+
+  /* Settings fills the screen like the other tabs. */
+  dialog#settings { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; }
+  dialog#settings form { height: 100%; max-height: 100dvh; padding: calc(12px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+  #settings .dialog-head { position: sticky; top: calc(-12px - env(safe-area-inset-top)); z-index: 2; background: var(--panel); margin: calc(-12px - env(safe-area-inset-top)) -16px 0; padding: calc(12px + env(safe-area-inset-top)) 16px 10px; }
+  .inline-row { flex-direction: column; align-items: stretch; }
+  .inline-row label { min-width: 0; }
+  .inline-row .btn { justify-content: center; }
 }
-@media (max-width: 760px) and (prefers-color-scheme: dark) {
-  :root { --ios-grouped: #000000; --ios-row: #1c1c1e; --ios-sep: rgba(84, 84, 88, 0.6); }
-  .suggestion:active { background: rgba(255, 255, 255, 0.08); }
-  .suggestion::after { border-color: #5a5a5f; }
+
+/* Dismiss buttons on notifications */
+.toast-text { flex: 1; min-width: 0; }
+.toast-close, .notify-close {
+  flex: none; width: 28px; height: 28px; margin: -4px -6px 0 0; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: transparent; color: var(--muted); cursor: pointer;
 }
+.toast-close:hover, .notify-close:hover { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.notify-box { position: relative; }
+.notify-close { position: absolute; top: 10px; right: 10px; margin: 0; color: rgb(255 255 255 / 80%); }
+.notify-close:hover { color: #fff; background: rgb(255 255 255 / 18%); }

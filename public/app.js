@@ -132,13 +132,25 @@ const initials = (name = "") =>
     .join("") || "?";
 
 function toast(title, body, { iconName = "sparkles", onclick } = {}) {
-  const t = el("div", { class: "toast", onclick }, el("div", { class: "ti", html: icon(iconName, 16) }), el("div", {}, el("b", {}, title), el("span", {}, body || "")));
-  if (onclick) t.style.cursor = "pointer";
-  $("#toasts").append(t);
-  setTimeout(() => {
+  const dismiss = () => {
+    if (t.classList.contains("out")) return;
     t.classList.add("out");
     setTimeout(() => t.remove(), 300);
-  }, 7000);
+  };
+  const close = el("button", {
+    type: "button",
+    class: "toast-close",
+    "aria-label": "Dismiss notification",
+    html: icon("x", 14),
+    onclick: (e) => {
+      e.stopPropagation();
+      dismiss();
+    },
+  });
+  const t = el("div", { class: "toast", onclick }, el("div", { class: "ti", html: icon(iconName, 16) }), el("div", { class: "toast-text" }, el("b", {}, title), el("span", {}, body || "")), close);
+  if (onclick) t.style.cursor = "pointer";
+  $("#toasts").append(t);
+  setTimeout(dismiss, 7000);
 }
 
 // Follow the conversation only if the student hasn't scrolled up to read.
@@ -1081,8 +1093,12 @@ async function pollNotifications() {
 
 function setupNotifyBox() {
   const box = $("#notifyBox");
-  if (!("Notification" in window) || Notification.permission !== "default") return box.classList.add("hidden");
+  if (!("Notification" in window) || Notification.permission !== "default" || store.get("notifyBoxDismissed", false)) return box.classList.add("hidden");
   box.classList.remove("hidden");
+  $("#notifyClose").onclick = () => {
+    store.set("notifyBoxDismissed", true);
+    box.classList.add("hidden");
+  };
   $("#enableNotify").onclick = async () => {
     await Notification.requestPermission();
     setupNotifyBox();
