@@ -15,42 +15,38 @@ Judges walk up to your table between **10:30 AM and 12:30 PM Sunday**. You get a
 
 ---
 
-## The 2-minute pitch
+## The 2-minute pitch (with the slides)
 
-**0:00 – The problem (15 s)**
-> "I'm Belal, a student at SF State. Every student juggles four or five Canvas courses that move fast: deadlines in one place, announcements in another, readings the professor only mentions out loud. Canvas has everything, but it's a filing cabinet, not an assistant. For me it's even harder because I have ADHD, so I built Cuss, for every student and teacher."
+**Before each judge:** student demo already signed in on localhost (Settings → **Start the demo over**), auto-send **off**, deck open in another tab on slide 1. Switch tabs with **Ctrl+Tab** (or click the tab).
 
-**0:15 – What Cuss is (5 s)**
-> "Cuss is an AI assistant that signs in to your Canvas and handles your semester. Here it is, live."
+| Time | Slide | Do | Say |
+|---|---|---|---|
+| 0:00–0:05 | **1 · Cover** | — | "Hi, I'm Belal. This is Cuss." |
+| 0:05–0:20 | **2 · The problem** | — | "I built Cuss because I have ADHD. Canvas holds my assignments, messages and lecture files, but keeping track of everything across classes is still work. Cuss turns that information into a clear next step, for every student. Let me show you." |
+| 0:20 | **3 · Live demo** | Switch to the app | — |
+| 0:20–0:50 | *app* | Type **"What should I work on tonight? Anything missing?"** Point at one assignment, like the missing one. | "This is a practice Canvas account with sample classes, and the AI is real. You can see every step it takes: it's checking my deadlines and missing work, then telling me where to start." |
+| 0:50–1:20 | *app* | Type **"Make a two-question practice quiz from the BIOL 230 lecture slides."** Answer one question and show the explanation. | "It reads my actual course files, like PDFs, PowerPoints and Word docs, and turns them into practice questions." |
+| 1:20–1:40 | *app* | Type **"Draft an email to Dr. Chen asking about Wednesday office hours."** Leave it unsent. | "When I need help, Cuss finds the right instructor and drafts the message. Nothing sends until I review it." |
+| 1:40–1:50 | **4 · Impact** | Switch back to the slides | "There's also a professor mode for spotting missing work and preparing student check-ins. We measure impact inside the app: missing work over time, emails actually sent, and quiz scores. The next step is a pilot at SF State once Canvas access is approved." |
+| 1:50–2:00 | **5 · Try it** | Leave the QR code up | "Canvas stores the information. Cuss helps students act on it. Scan this to try it yourself." |
 
-One flow, start to finish:
+**While the AI is thinking** (real answers can take 10–20 seconds), keep talking: point at the step bubbles ("now it's reading the lecture PDF").
+**If the quiz picks the wrong file,** ask again with "from the Lecture 15 membrane transport slides."
+**If anything breaks,** say "let me show you the recording" and play the backup video.
 
-**0:20 – "What needs my attention?" (25 s)**
-Type: **"What needs my attention this week?"** Point at the step bubbles as they appear.
-> "It's checking my deadlines, announcements and messages right now, and I can see every step. It caught that my biology quiz moved, and that my history professor offered to reopen a quiz."
+### Backup slides (after the QR slide) for judges' questions
 
-**0:45 – Explain a deadline (20 s)**
-Type: **"What do I need to know for Quiz 5?"**
-> "Instead of guessing, it opens my professor's actual Lecture 15 slides from Canvas and tells me what's on the quiz."
+| Slide | Open it when a judge asks… |
+|---|---|
+| 6 · Meet Cuss | "What else does it do?" |
+| 7 · Every class, organized | "Can it handle readings that aren't in Canvas?" Live: "The Wilson speech reading is due next class, remind me tomorrow night." |
+| 8 · How it works | "How does it work?" / "How does it connect to Canvas?" |
+| 9 · Trust | "Where could Claude go wrong?" (Anthropic track) |
+| 10 · Professors | "What about teachers?" Live: Settings → Log out → **Professor demo** → "Who's falling behind?" |
+| 11 · On your phone | "Does it work on iPhone?" |
+| 12 · What's next | "What's next?" |
 
-**1:05 – Quiz me from the real lecture notes (25 s)**
-Type: **"Quiz me on it."** Answer one question.
-> "The questions come from my professor's real PDF, diagrams and all, not random internet content."
-
-**1:30 – Draft a professor email (20 s)**
-Type: **"Email Dr. Chen and ask if I can come to office hours before the quiz."**
-> "It finds my professor and writes a polite, specific email. Nothing sends until I review it and press Send."
-Don't press Send unless a judge asks.
-
-**1:50 – Close (10 s)**
-> "We measure impact inside the app: missing assignments over time, reminders, emails actually sent, and quiz scores. It's ready for SF State as soon as the school approves it, and it works at any Canvas school. Scan this to try it yourself."
-Hand over the QR code.
-
-### If there's time, or a judge asks
-- **Professor mode:** Settings → Log out → **Professor demo** → "Who's falling behind?" → "Draft an announcement about Quiz 5." *"Same Canvas login; professors can reach struggling students sooner."*
-- **Due next class:** "The Wilson speech reading is due next class, remind me tomorrow night" → the card's **Add to Calendar** and **Add to Reminders**, then **Open class**.
-- **Inbox:** under Messages click **Prof. Ortiz** → reply draft → **Send reply**. The demo professor answers about 15 seconds later; Cuss checks for new replies about every minute, so the alert can take a minute or so.
-- **Voice:** tap **Talk**, ask "What should I work on tonight?"
+Every slide's speaker notes contain exactly what to say.
 
 ---
 
