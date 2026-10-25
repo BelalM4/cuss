@@ -28,6 +28,8 @@ Canvas has everything a student needs, but it's a filing cabinet, not an assista
 | AI agent | Claude (Anthropic API) with tool use: it decides which Canvas data to fetch, reads PDFs natively, and every step streams to the screen |
 | Canvas | Canvas REST API and official Canvas OAuth2 sign-in through the school's SSO |
 | Server | Node.js + Express, per-user storage, encrypted tokens, background reminders |
+| Class library | Per-class files (Canvas imports and uploads), notes, readings with "next class" dates, reminders |
+| Calendar | Private auto-updating iCalendar feed (webcal) for iPhone, Google and Outlook; per-item events; Reminders via the share sheet or the native app |
 | App | Vanilla JavaScript, HTML and CSS (no build step), installable PWA, Web Speech API for voice, Capacitor project for iOS and Android |
 | Quality | `node:test` suite and GitHub Actions; hosted on Render (`render.yaml`) |
 | Built with | Claude Code, during the hackathon |
@@ -58,7 +60,7 @@ Students click **"Log in with SFSU Canvas"**, sign in on the usual school login 
 
 **Cuss for Professors.** When an instructor signs in, Cuss switches to professor mode automatically (Canvas tells it who teaches what): who's falling behind (missing work, low scores), what needs grading, summaries of and reply drafts for student messages, kind check-in messages to students with missing work, course announcements the professor reviews and posts, and practice quizzes built from their own lecture files. Student privacy comes first: grades are only ever shown to the professor, and nothing reaches students until the professor approves it. Try it with **Professor demo** on the login page.
 
-Each student's chats, notes and settings are private to them. Students can log out, or delete their data and disconnect at any time (Settings → *Delete my data*).
+Each student's chats, notes, uploaded files and settings are private to them. Students can log out, or delete their data and disconnect at any time (Settings → *Delete my data*).
 
 ---
 
@@ -114,6 +116,10 @@ Things to try:
 - "Make flashcards from this week's module in Chem."
 - "Remind me tomorrow at 6pm to start my essay."
 - "Remember that I'm a nursing major and I like practice questions."
+- "The chapter 4 reading for history is due next class, remind me tomorrow night."
+- "Quiz me on the notes I uploaded to bio."
+
+**Class files & notes:** in the Today panel, tap a class under **Classes**. Tap the days it meets, then upload files, write notes, add readings or to-dos ("Read chapter 4" → **Next class**), set reminders, and send anything to **Calendar** or **Reminders**. **Bring in Canvas files** pulls in the class's lecture files.
 
 > 🎤 Voice input works best in **Chrome or Edge**. Allow microphone access when asked.
 
@@ -124,7 +130,8 @@ Things to try:
 | Independent mode | Daily check-in at your chosen time, saved as a ☀️ *Daily briefing* chat. **Run a briefing now** tries it out right away. |
 | Send emails without asking me | **Off (recommended):** you review every email and press Send. **On:** Cuss sends as soon as you ask. Independent check-ins never send emails. |
 | What Cuss remembers | View, add or delete Cuss's notes about you. |
-| Delete my data & disconnect | Erases your chats, notes and settings and revokes Cuss's Canvas access. |
+| iPhone Calendar & Reminders | **Add to iPhone Calendar** subscribes to a private calendar of deadlines, readings and reminders that updates itself. **Copy link** for Google or Outlook. **Turn off my old calendar link** if you shared it by mistake. |
+| Delete my data & disconnect | Erases your chats, notes, uploaded class files and settings, and revokes Cuss's Canvas access. |
 
 ## Troubleshooting
 - **The login page says Canvas login isn't switched on:** the Developer Key isn't in `.env` yet (see step 2).
@@ -135,6 +142,7 @@ Things to try:
 - Canvas tokens are **encrypted at rest** (AES-256-GCM; key from `TOKEN_ENCRYPTION_KEY`, generated automatically on Render).
 - Each student's data is isolated; cross-site requests are blocked; per-student and overall daily AI caps.
 - **Log out of all devices** and **Delete my data & disconnect** in Settings.
+- Calendar links use a long random private token and can be turned off and replaced from Settings.
 - Accessibility: labeled controls, visible keyboard focus, a skip link, screen-reader announcements for new messages, and reduced-motion support.
 - **Tests:** `npm test` runs 27 automated tests (OAuth sign-in, data isolation, email/reply drafts, professor mode, class library and calendar links, PDF/PowerPoint/Word reading, encryption, caps, sessions). They also run on every push via GitHub Actions.
 
