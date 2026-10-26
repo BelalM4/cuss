@@ -54,7 +54,12 @@ app.use((req, res, next) => {
   else next();
 });
 
+// The app itself is React (web/, built into web/dist by `npm run build`, which
+// runs after every npm install). Login and the other pages live in public/.
+const webDist = path.join(here, "web", "dist");
+app.use(express.static(webDist));
 app.use(express.static(path.join(here, "public")));
+app.get("/", (req, res) => res.status(503).type("text").send("The Cuss app isn't built yet. Run `npm run build`, then restart."));
 
 const wrap = (fn) => async (req, res) => {
   try {
