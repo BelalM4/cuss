@@ -167,7 +167,10 @@ Things to try:
 - `lib/demo-canvas.js`: "Demo University", a mock Canvas (student and professor) that speaks the real Canvas API.
 - `lib/files.js`: reads PDFs, PowerPoint and Word files for Claude.
 - `lib/library.js`: each class's files, notes, readings, to-dos, "next class" dates and calendar events.
-- `public/`: the web app (`login.html` landing page, chat with live AI steps, Today panel, voice mode, flashcards, quizzes, professor dashboard).
+- `web/`: the app itself, in React (chat with live AI steps, Today panel, voice mode, flashcards, quizzes, class library, professor dashboard). `npm install` builds it into `web/dist`, which the server serves.
+- `public/`: the login landing page, privacy, impact and share pages, styles, icons and the service worker.
+
+**Working on the app:** run `npm start` in one terminal and `npm run dev` in another, then open <http://localhost:5173>. Changes show up instantly, and API calls go to the server on port 3000. Run `npm run build` before `npm start` alone picks up your changes.
 
 Built at Cal Hacks 13.0. Install it on a phone by opening the link and tapping **Add to Home Screen**. For App Store and Google Play builds, see **`mobile/STORE-GUIDE.md`**.
 
