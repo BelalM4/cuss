@@ -1,6 +1,6 @@
 // The conversation: welcome screen, messages, live steps and cards. It follows
 // new content only while the student is at the bottom (not reading back).
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { memo, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Icon, useApp } from "./ui.jsx";
 import { markdown, plainText } from "./lib/util.js";
 import { speak } from "./lib/speech.js";
@@ -136,7 +136,8 @@ function BotRow({ children }) {
   );
 }
 
-function Item({ item }) {
+// Only the message that changed re-renders while a reply streams in.
+const Item = memo(function Item({ item }) {
   switch (item.kind) {
     case "user":
       return (
@@ -180,7 +181,7 @@ function Item({ item }) {
     default:
       return null;
   }
-}
+});
 
 function Card({ card }) {
   if (card.kind === "draft" || card.kind === "reply" || card.kind === "announcement") return <DraftCard draft={card} />;
@@ -192,13 +193,14 @@ function Card({ card }) {
 
 function BotMessage({ text, streaming }) {
   const { toast } = useApp();
+  const html = useMemo(() => ({ __html: markdown(text) }), [text]);
   return (
     <div className="msg bot">
       <div className="orb av">
         <span />
       </div>
       <div className={`bubble${streaming ? " cursor" : ""}`}>
-        <div className="md" dangerouslySetInnerHTML={{ __html: markdown(text) }} />
+        <div className="md" dangerouslySetInnerHTML={html} />
         <div className="msg-tools">
           {!streaming && (
             <>

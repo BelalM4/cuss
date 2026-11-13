@@ -23,7 +23,7 @@ export default function App() {
   const [status, setStatus] = useState(null);
   const isTeacher = status?.role === "teacher";
   const dash = useDashboard(status);
-  const summary = summarize(dash, isTeacher);
+  const summary = useMemo(() => summarize(dash, isTeacher), [dash, isTeacher]);
   const openDraftRef = useRef(null); // newest unsent email draft, for the "send it" voice command
 
   // --- Panels and layout

@@ -1,6 +1,6 @@
 // Loads everything on the Today panel. Each section keeps its last data while
 // it reloads, so refreshing never flashes empty lists.
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { api } from "./lib/util.js";
 
 const section = (data = null) => ({ state: "loading", data, error: null });
@@ -38,7 +38,10 @@ export function useDashboard(status) {
     else load(setCourses, () => api("/api/courses"), "Couldn’t load classes.");
   }, [loadInbox, loadImpact, loadReadings]);
 
-  return { deadlines, inbox, impact, readings, courses, teacher, loadDashboard, loadInbox, loadImpact, loadReadings };
+  return useMemo(
+    () => ({ deadlines, inbox, impact, readings, courses, teacher, loadDashboard, loadInbox, loadImpact, loadReadings }),
+    [deadlines, inbox, impact, readings, courses, teacher, loadDashboard, loadInbox, loadImpact, loadReadings],
+  );
 }
 
 // Numbers for the stats row, badges and the welcome line.
